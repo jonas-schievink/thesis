@@ -25,7 +25,7 @@ class Motor {
 
 public:
     /**
-     * @brief Create a Motor object attached to speed and direction pins
+     * @brief Create a Motor object using speed and direction pins
      * @param speed_pin @ref Pin object controlling the motor speed via PWM
      * @param dir_pin @ref Pin object controlling the direction of the motor
      * 

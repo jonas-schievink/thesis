@@ -25,14 +25,19 @@ class Encoder {
     // current tick counter
     int m_relcount;
 
+    static void pulse_helper(int gpio, int level, uint32_t tick, void* user);
+
+    void pulse(int pin_num, int level);
+
 public:
     /**
      * @brief Create a new `Encoder` attached to 2 pins.
+     * 
+     * The pins will not be reconfigured. You must configure pullups as
+     * appropriate before creating the `Encoder`.
      */
     Encoder(pigpio::Pin chan_a, pigpio::Pin chan_b);
     
-    void pulse(int pin_num, int level);
-
     /**
      * @brief Reads the number of counts since the last call of `read`
      * 
