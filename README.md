@@ -33,4 +33,7 @@ Standard-Setup von Ubuntu et al. aber ausreichen (evtl. hilft es, testweise das
 LAN-Interface im Network Manager auf "Link-Local only" zu stellen - dann tun
 natürlich andere Anwendungen nicht mehr).
 
+TODO: Zusätzlich statische IP einrichten, damit Integration einfacher (welche
+IP, welches Netz?).
+
 [mDNS]: https://en.wikipedia.org/wiki/Multicast_DNS
