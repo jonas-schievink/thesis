@@ -22,4 +22,21 @@ https://github.com/kenrestivo/linux/blob/b74f2674fd49a1d58baf5dbe5f0fbe052b65f87
     compatible = "brcm,bcm2835", "brcm,bcm2708",
                  "brcm,bcm2836", "brcm,bcm2709",
                  "brcm,bcm2837";
-}
+    // FIXME: bcm2708 should be enough
+
+    fragment@0 {
+        target-path = <&gpio>;
+        __overlay__ {
+            rot0_pins: rot0_pins {
+                brcm,pins = <7 8>;
+                brcm,function = <0>;
+                brcm,pull = <2>;    // 0: none, 1: pull-down, 2: pull-up
+            };
+        };
+    };
+
+    __overrides__ {
+        rot0_a = <&rot0_pins>,"bytes.0";
+        // TODO: ...
+    };
+};

@@ -37,3 +37,11 @@ TODO: Zusätzlich statische IP einrichten, damit Integration einfacher (welche
 IP, welches Netz?).
 
 [mDNS]: https://en.wikipedia.org/wiki/Multicast_DNS
+
+### Encodertreiber (Device Tree)
+
+Der Plan ist, die Encoder über Linux' eingebauten `rotary-encoder` Treiber
+laufen zu lassen. Dazu muss ein Device Tree Overlay geschrieben werden.
+
+Leider ist der Kernel zu alt (4.4) bzw. das `dtc`-Tool inkompatibel mit dem vom
+Kernel benötigten. Man müsste also `dtc` selbst kompilieren.
