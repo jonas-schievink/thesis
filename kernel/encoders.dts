@@ -9,7 +9,7 @@ https://github.com/kenrestivo/linux/blob/b74f2674fd49a1d58baf5dbe5f0fbe052b65f87
 */
 
 /dts-v1/;
-//plugin/;
+/plugin/;
 
 / {
     /*
@@ -25,18 +25,33 @@ https://github.com/kenrestivo/linux/blob/b74f2674fd49a1d58baf5dbe5f0fbe052b65f87
     // FIXME: bcm2708 should be enough
 
     fragment@0 {
-        target-path = <&gpio>;
+        target = <&gpio>;
         __overlay__ {
-            rot0_pins: rot0_pins {
-                brcm,pins = <7 8>;
+            rot_l_pins: rot_l_pins {
+                brcm,pins = <11 10>; // <A B>
                 brcm,function = <0>;
                 brcm,pull = <2>;    // 0: none, 1: pull-down, 2: pull-up
             };
         };
     };
 
+    fragment@1 {
+        target = <&soc>;
+        __overlay__ {
+            rot_left: rotary@0 {
+                compatible = "rotary-encoder";
+                gpios = <&gpio 11 0>, <&gpio 10 0>;
+                linux,axis = <0>;   // REL_X / ABS_X
+                //rotary-encoder,relative-axis;
+            };
+        };
+    };
+
+    /*
     __overrides__ {
-        rot0_a = <&rot0_pins>,"bytes.0";
+        rot_l_a = <&rot_l_pins>,"bytes.0";
+        rot_l_b = <&rot_l_pins>,"bytes.1";
         // TODO: ...
     };
+    */
 };

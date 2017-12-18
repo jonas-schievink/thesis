@@ -1,2 +1,8 @@
+# CMake build directories
 build/
+
+# Cached Python bytecode
 __pycache__/
+
+# Compiled device tree overlays
+*.dtbo
