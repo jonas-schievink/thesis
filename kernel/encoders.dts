@@ -19,18 +19,22 @@ https://github.com/kenrestivo/linux/blob/b74f2674fd49a1d58baf5dbe5f0fbe052b65f87
     This overlay *should* work with all of them. I don't know if specifying
     just the chip or family is enough, so just LIST ALL OF THEM.
     */
-    compatible = "brcm,bcm2835", "brcm,bcm2708",
-                 "brcm,bcm2836", "brcm,bcm2709",
-                 "brcm,bcm2837";
-    // FIXME: bcm2708 should be enough
+    // Just bcm2708 should be enough I hope
+    compatible = "brcm,bcm2708";
 
     fragment@0 {
         target = <&gpio>;
         __overlay__ {
-            rot_l_pins: rot_l_pins {
-                brcm,pins = <11 10>; // <A B>
+            rot_left_pins: rot_left_pins {
+                brcm,pins = <11 10>;    // <A B>
+                brcm,function = <0>;    // 0: in, 1: out
+                brcm,pull = <0>;        // 0: none, 1: pull-down, 2: pull-up
+            };
+
+            rot_right_pins: rot_right_pins {
+                brcm,pins = <21 20>;
                 brcm,function = <0>;
-                brcm,pull = <2>;    // 0: none, 1: pull-down, 2: pull-up
+                brcm,pull = <0>;
             };
         };
     };
@@ -38,19 +42,35 @@ https://github.com/kenrestivo/linux/blob/b74f2674fd49a1d58baf5dbe5f0fbe052b65f87
     fragment@1 {
         target = <&soc>;
         __overlay__ {
-            rot_left: rotary@0 {
+            rot_left: rot_left {
                 compatible = "rotary-encoder";
+                pinctrl-names = "default";
+                pinctrl-0 = <&rot_left_pins>;
                 gpios = <&gpio 11 0>, <&gpio 10 0>;
                 linux,axis = <0>;   // REL_X / ABS_X
                 //rotary-encoder,relative-axis;
+                rotary-encoder,rollover;
+                rotary-encoder,steps = <10000>;
+            };
+
+            rot_right: rot_right {
+                compatible = "rotary-encoder";
+                pinctrl-names = "default";
+                pinctrl-0 = <&rot_right_pins>;
+                gpios = <&gpio 21 0>, <&gpio 20 0>;
+                linux,axis = <0>;   // REL_X / ABS_X
+                //rotary-encoder,relative-axis;
+                rotary-encoder,rollover;
+                rotary-encoder,steps = <10000>;
             };
         };
     };
 
+    // These overrides could be used to allow external configuration:
     /*
     __overrides__ {
-        rot_l_a = <&rot_l_pins>,"bytes.0";
-        rot_l_b = <&rot_l_pins>,"bytes.1";
+        rot_left_a = <&rot_left_pins>,"bytes.0";
+        rot_left_b = <&rot_left_pins>,"bytes.1";
         // TODO: ...
     };
     */
