@@ -2,6 +2,10 @@
 
 Device tree overlay for KURT's 2 rotary encoders.
 
+When this is loaded, 2 new input devices should appear in /dev/input/ (named
+"soc:rot_left" and "soc:rot_right"). They can be accessed like any other event
+device like a game controller. Use `evtest` to test them.
+
 Sources:
 http://www.mjoldfield.com/atelier/2017/03/rpi-devicetree.html
 https://github.com/kenrestivo/linux/blob/b74f2674fd49a1d58baf5dbe5f0fbe052b65f873/arch/arm/boot/dts/overlays/rotaries-overlay.dts
@@ -16,10 +20,8 @@ https://github.com/kenrestivo/linux/blob/b74f2674fd49a1d58baf5dbe5f0fbe052b65f87
     First-gen Pis (A, B, B+, Zero, Compute): BCM2835 chip, BCM2708 family
     Pi 2: BCM2836 chip, BCM2709 family
     Pi 3: BCM2837 chip, BCM2709 family
-    This overlay *should* work with all of them. I don't know if specifying
-    just the chip or family is enough, so just LIST ALL OF THEM.
+    This overlay *should* work with all of them. Just bcm2708 should be enough.
     */
-    // Just bcm2708 should be enough I hope
     compatible = "brcm,bcm2708";
 
     fragment@0 {
