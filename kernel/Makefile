@@ -1,7 +1,9 @@
 # root overlay configfs directory
 CONFIGFS_PATH=/sys/kernel/config/device-tree/overlays/
-# basename of the dtbo file
-OVERLAY_BASE=encoders
+# basename of the dts/dtbo files
+OVERLAY_BASE=kurt-encoders
+# installation directory for the dtbo
+INSTALL_DIR=/boot/overlays
 
 # overlay directory in the configfs
 OVERLAY_DIR=$(CONFIGFS_PATH)$(OVERLAY_BASE)
@@ -24,4 +26,15 @@ load: build
 unload:
 	rmdir $(OVERLAY_DIR)
 
-# TODO: Install target, cp dtbo to /boot/overlays
+install: build
+	@echo "Installing $(OVERLAY_BASE).dtbo to $(INSTALL_DIR) (this needs root privileges)"
+	@cp "$(OVERLAY_BASE).dtbo" "$(INSTALL_DIR)/$(OVERLAY_BASE).dtbo"
+	@echo "Done. You can load $(OVERLAY_BASE).dtbo on boot by putting this into config.txt:"
+	@echo "    dtoverlay=$(OVERLAY_BASE)"
+
+uninstall:
+	@echo "Removing $(INSTALL_DIR)/$(OVERLAY_BASE).dtbo"
+	@rm "$(INSTALL_DIR)/$(OVERLAY_BASE).dtbo"
+
+clean:
+	@rm $(OVERLAY_BASE).dtbo
