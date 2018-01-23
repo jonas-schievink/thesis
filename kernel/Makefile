@@ -26,18 +26,15 @@ load: build
 unload:
 	rmdir $(OVERLAY_DIR)
 
-# (un)install targets disabled because loading the overlay the intended way does
-# not work.
+install: build
+	@echo "Installing $(OVERLAY_BASE).dtbo to $(INSTALL_DIR) (this needs root privileges)"
+	@cp "$(OVERLAY_BASE).dtbo" "$(INSTALL_DIR)/$(OVERLAY_BASE).dtbo"
+	@echo "Done. You can load $(OVERLAY_BASE).dtbo on boot by putting this into config.txt:"
+	@echo "    dtoverlay=$(OVERLAY_BASE)"
 
-#install: build
-#	@echo "Installing $(OVERLAY_BASE).dtbo to $(INSTALL_DIR) (this needs root privileges)"
-#	@cp "$(OVERLAY_BASE).dtbo" "$(INSTALL_DIR)/$(OVERLAY_BASE).dtbo"
-#	@echo "Done. You can load $(OVERLAY_BASE).dtbo on boot by putting this into config.txt:"
-#	@echo "    dtoverlay=$(OVERLAY_BASE)"
-
-#uninstall:
-#	@echo "Removing $(INSTALL_DIR)/$(OVERLAY_BASE).dtbo"
-#	@rm "$(INSTALL_DIR)/$(OVERLAY_BASE).dtbo"
+uninstall:
+	@echo "Removing $(INSTALL_DIR)/$(OVERLAY_BASE).dtbo"
+	@rm "$(INSTALL_DIR)/$(OVERLAY_BASE).dtbo"
 
 clean:
 	@rm $(OVERLAY_BASE).dtbo
