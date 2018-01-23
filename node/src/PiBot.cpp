@@ -8,7 +8,7 @@
  */
 
 #include "PiGPIO.hpp"
-#include "Encoder.hpp"
+#include "GPIOEncoder.hpp"
 #include "Motor.hpp"
 
 #include <iostream>

@@ -1,10 +1,10 @@
 /**
- * @file Encoder.hpp
+ * @file GPIOEncoder.hpp
  * @brief Allows reading rotary encoders attached to the GPIO pins
  */
 
-#ifndef ENCODER_HPP
-#define ENCODER_HPP
+#ifndef GPIOENCODER_HPP
+#define GPIOENCODER_HPP
 
 #include "PiGPIO.hpp"
 
@@ -32,19 +32,19 @@ class Encoder {
 public:
     /**
      * @brief Create a new `Encoder` attached to 2 pins.
-     * 
+     *
      * The pins will not be reconfigured. You must configure pullups as
      * appropriate before creating the `Encoder`.
      */
     Encoder(pigpio::Pin chan_a, pigpio::Pin chan_b);
-    
+
     /**
      * @brief Reads the number of counts since the last call of `read`
-     * 
+     *
      * If this is the first call to `read`, returns the number of counts since
      * the creation of the `Encoder`.
      */
     int read();
 };
 
-#endif  // ENCODER_HPP
+#endif  // GPIOENCODER_HPP

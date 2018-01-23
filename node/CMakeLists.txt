@@ -24,7 +24,7 @@ endif(DOXYGEN_FOUND)
 add_library(pigpio++ src/PiGPIO.cpp)
 target_link_libraries(pigpio++ ${pigpio_LIBRARY})
 
-add_executable(pibot src/Encoder.cpp src/Motor.cpp src/PiBot.cpp)
+add_executable(pibot src/GPIOEncoder.cpp src/Motor.cpp src/PiBot.cpp)
 target_link_libraries(pibot pigpio++ pthread)
 
 # Note: This isn't the correct way to include `pthread`, but it works on Linux

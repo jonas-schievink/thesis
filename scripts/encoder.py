@@ -1,9 +1,12 @@
 #!/usr/bin/python3
 
 """
-This is a module providing access to KURT's rotary encoders.
+This is a module providing access to KURT's rotary encoders attached to GPIOs.
 
 It can also be invoked directly, in which case it displays the counts of an encoder.
+
+It does *not* work if the encoders are integrated using the device-tree overlay
+and rotary-enoder driver.
 """
 
 import argparse
@@ -62,10 +65,10 @@ class Encoder:
                 elif gpio == self._ch_b and level == 1:
                     if self._lvl_a:
                         self.count -= 1
-                    
+
         self._cb_a = pi.callback(ch_a, pigpio.EITHER_EDGE, callback)
         self._cb_b = pi.callback(ch_b, pigpio.EITHER_EDGE, callback)
-    
+
     def stop(self):
         """
         Disables the level change callbacks, stops counting ticks.
@@ -102,7 +105,7 @@ if __name__ == "__main__":
 
     pi = pigpio.pi()
     enc = Encoder(pi, pina, pinb, pull)
- 
+
     try:
         while True:
             sys.stdout.write("Count: %d     \r" % enc.count)
@@ -110,4 +113,3 @@ if __name__ == "__main__":
     finally:
         enc.stop()
         pi.stop()
-   
