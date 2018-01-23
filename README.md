@@ -51,3 +51,13 @@ mehr nötig sein, wenn das `device-tree-compiler`-Paket aktualisiert wurde.
 
 [Kernelquellen]: https://github.com/raspberrypi/linux
 [kernel-commit]: https://github.com/raspberrypi/linux/commit/e80a8a55ba8512b531c9447d1307378bccc98a40
+
+## Workflow
+
+Nachdem man über LAN mit dem Pi verbunden ist, kann man folgenden Befehl
+ausführen, um das `kurtberry-pi` Repo auf dem Pi lokal einzubinden:
+
+    sshfs kurtberry-pi pi@kurtberry-pi.local:kurtberry-pi
+
+Jetzt kann man normal im `kurtberry-pi` Ordner editieren und git nutzen. Zum
+Kompilieren kann man eine SSH-Sitzung öffnen.
