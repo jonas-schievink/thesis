@@ -10,7 +10,7 @@ Das ist das Arbeits-Repository für meine Bachelorarbeit.
 
 ## Über das Setup
 
-### Ethernet
+### LAN
 
 Der LAN-Port des Pis kann benutzt werden, um ihn an ein größeres ROS-Setup
 anzubinden. Ich habe ein sehr minimalistisches aber praktisches Netzwerksetup
@@ -30,8 +30,7 @@ Funktioniert das Anpingen der IP, aber nicht das Auflösen des Hostnamens, ist
 vermutlich eine fehlerhafte mDNS-Konfiguration schuld. Das wird normalerweise
 von Avahi oder systemd-networkd gemacht. Meines Wissens nach sollte das
 Standard-Setup von Ubuntu et al. aber ausreichen (evtl. hilft es, testweise das
-LAN-Interface im Network Manager auf "Link-Local only" zu stellen - dann tun
-natürlich andere Anwendungen nicht mehr).
+LAN-Interface im Network Manager auf "Link-Local only" zu stellen).
 
 TODO: Zusätzlich statische IP einrichten, damit Integration einfacher (welche
 IP, welches Netz?).
@@ -43,5 +42,12 @@ IP, welches Netz?).
 Der Plan ist, die Encoder über Linux' eingebauten `rotary-encoder` Treiber
 laufen zu lassen. Dazu muss ein Device Tree Overlay geschrieben werden.
 
-Leider ist der Kernel zu alt (4.4) bzw. das `dtc`-Tool inkompatibel mit dem vom
-Kernel benötigten. Man müsste also `dtc` selbst kompilieren.
+Leider ist das `dtc`-Tool aus den Repos inkompatibel mit dem vom Kernel
+benötigten. Deswegen wurde es aus den Raspberry Pi [Kernelquellen] (Commit
+[`e80a8a55ba8512b531c9447d1307378bccc98a40`][kernel-commit], Branch `rpi-4.9.y`)
+kompiliert und nach `/usr/local/bin` installiert. Bei Bedarf kann das mit
+`make ARCH=arm dtbs` reproduziert werden. Dieser Schritt wird hoffentlich nicht
+mehr nötig sein, wenn das `device-tree-compiler`-Paket aktualisiert wurde.
+
+[Kernelquellen]: https://github.com/raspberrypi/linux
+[kernel-commit]: https://github.com/raspberrypi/linux/commit/e80a8a55ba8512b531c9447d1307378bccc98a40
