@@ -50,7 +50,6 @@ https://github.com/kenrestivo/linux/blob/b74f2674fd49a1d58baf5dbe5f0fbe052b65f87
                 pinctrl-0 = <&rot_left_pins>;
                 gpios = <&gpio 11 0>, <&gpio 10 0>;
                 linux,axis = <0>;   // REL_X / ABS_X
-                //rotary-encoder,relative-axis;
                 rotary-encoder,rollover;
                 rotary-encoder,steps = <10000>;
             };
@@ -61,14 +60,13 @@ https://github.com/kenrestivo/linux/blob/b74f2674fd49a1d58baf5dbe5f0fbe052b65f87
                 pinctrl-0 = <&rot_right_pins>;
                 gpios = <&gpio 21 0>, <&gpio 20 0>;
                 linux,axis = <0>;   // REL_X / ABS_X
-                //rotary-encoder,relative-axis;
                 rotary-encoder,rollover;
                 rotary-encoder,steps = <10000>;
             };
         };
     };
 
-    // These overrides could be used to allow external configuration:
+    // TODO: These overrides could be used to allow external configuration:
     /*
     __overrides__ {
         rot_left_a = <&rot_left_pins>,"bytes.0";
