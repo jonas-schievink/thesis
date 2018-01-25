@@ -7,13 +7,14 @@
 #define GPIOENCODER_HPP
 
 #include "PiGPIO.hpp"
+#include "Encoder.hpp"
 
 // TODO Document expected encoder behaviour wrt channel signals #A and #B
 
 /**
  * @brief A rotary encoder attached to two GPIO pins.
  */
-class GPIOEncoder {
+class GPIOEncoder : public Encoder {
     pigpio::Pin m_chan_a;
     pigpio::Pin m_chan_b;
     // last recorded level of A channel
@@ -38,13 +39,7 @@ public:
      */
     GPIOEncoder(pigpio::Pin chan_a, pigpio::Pin chan_b);
 
-    /**
-     * @brief Reads the number of counts since the last call of `read`
-     *
-     * If this is the first call to `read`, returns the number of counts since
-     * the creation of the `Encoder`.
-     */
-    int read();
+    int read() override;
 };
 
 #endif  // GPIOENCODER_HPP

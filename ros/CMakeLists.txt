@@ -7,6 +7,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/ ${CMAKE_MODULE_PATH})
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
+# I want all the warnings
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -14,6 +17,7 @@ find_package(catkin REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 find_package(PiGPIO REQUIRED)
+find_package(Libevdev REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -115,7 +119,9 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 # include
-# ${catkin_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
+  ${pigpio_INCLUDE_DIR}
+  ${LIBEVDEV_INCLUDE_DIR}
 )
 
 ## Declare a C++ library
@@ -134,8 +140,10 @@ include_directories(
 add_executable(${PROJECT_NAME}_node
     src/Main.cpp
     src/GPIOEncoder.cpp
+    src/EvdevEncoder.cpp
     src/Motor.cpp
     src/PiGPIO.cpp
+    src/Utils.cpp
 )
 
 ## Rename C++ executable without prefix
@@ -152,6 +160,7 @@ add_executable(${PROJECT_NAME}_node
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
   ${pigpio_LIBRARY}
+  ${LIBEVDEV_LIBRARY}
   pthread
 )
 

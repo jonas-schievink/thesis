@@ -1,4 +1,4 @@
-#include "GPIOEncoder.hpp"
+#include "EvdevEncoder.hpp"
 #include "Motor.hpp"
 
 #include <iostream>
@@ -8,6 +8,6 @@ using std::endl;
 
 int main(int argc, char** argv)
 {
-    cout << "Wello" << endl;
+    Encoder* left = new EvdevEncoder("rot_left");
     return 0;
 }
