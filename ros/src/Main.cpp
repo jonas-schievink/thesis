@@ -1,3 +1,6 @@
+#include "GPIOEncoder.hpp"
+#include "Motor.hpp"
+
 #include <iostream>
 
 using std::cout;
