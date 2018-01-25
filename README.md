@@ -61,3 +61,13 @@ ausführen, um das `kurtberry-pi` Repo auf dem Pi lokal einzubinden:
 
 Jetzt kann man normal im `kurtberry-pi` Ordner editieren und git nutzen. Zum
 Kompilieren kann man eine SSH-Sitzung öffnen.
+
+### ROS
+
+Das ROS-Package in `ros` wurde in den Catkin-Workspace `~/catkin_ws` gelinkt:
+
+    ln -s ~/kurtberry-pi/ros ~/catkin_ws/src/kurtberry_pi
+
+Ausführen:
+
+    rosrun kurtberry_pi kurtberry_pi_node
