@@ -12,9 +12,9 @@
  * @brief Exception thrown when an `EvdevEncoder` can not find a matching input
  * device.
  */
-class EvdevNameException : public std::runtime_error {
+class EvdevException : public std::runtime_error {
 public:
-    EvdevNameException(const std::string& what);
+    EvdevException(const std::string& what);
 };
 
 /**
@@ -25,6 +25,7 @@ public:
  */
 class EvdevEncoder : public Encoder {
     struct libevdev* m_evdev;
+    int m_lastCount;
 
 public:
     /**
@@ -36,7 +37,7 @@ public:
      *
      * To figure out the device name, the `evtest` tool can be used.
      *
-     * If no or more than 1 device matches the name, an `EvdevNameException`
+     * If no or more than 1 device matches the name, an `EvdevException`
      * will be thrown.
      */
     EvdevEncoder(const std::string& search_name);

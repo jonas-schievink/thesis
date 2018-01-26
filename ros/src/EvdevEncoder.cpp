@@ -13,7 +13,7 @@
 using std::to_string;
 using std::strerror;
 
-EvdevNameException::EvdevNameException(const std::string& what) :
+EvdevException::EvdevException(const std::string& what) :
     std::runtime_error(what) {}
 
 /**
@@ -25,17 +25,17 @@ static struct libevdev* matchDevice(
     const std::string& dev_path,
     const std::string& search_name)
 {
-    int fd = open(dev_path.c_str(), O_RDONLY);
+    int fd = open(dev_path.c_str(), O_RDONLY | O_NONBLOCK);
     if (fd == -1)
     {
-        throw EvdevNameException("couldn't open() " + dev_path + ": " + strerror(errno));
+        throw EvdevException("couldn't open() " + dev_path + ": " + strerror(errno));
     }
 
     struct libevdev* dev;
     int err = libevdev_new_from_fd(fd, &dev);
     if (err < 0)
     {
-        throw EvdevNameException("couldn't open " + dev_path + " evdev: " + strerror(-err));
+        throw EvdevException("couldn't open " + dev_path + " evdev: " + strerror(-err));
     }
 
     std::string name = libevdev_get_name(dev);
@@ -84,7 +84,7 @@ EvdevEncoder::EvdevEncoder(const std::string& search_name)
 
     if (!dir)
     {
-        throw EvdevNameException("couldn't open " + basedir);
+        throw EvdevException("couldn't open " + basedir);
     }
 
     auto _guard = make_guard([&]() { closedir(dir); });
@@ -108,7 +108,7 @@ EvdevEncoder::EvdevEncoder(const std::string& search_name)
 
     if (devs.size() == 0)
     {
-        throw EvdevNameException("no device matching " + search_name + " found");
+        throw EvdevException("no device matching " + search_name + " found");
     }
 
     if (devs.size() > 1)
@@ -120,7 +120,7 @@ EvdevEncoder::EvdevEncoder(const std::string& search_name)
             info += "; ";
         }
 
-        throw EvdevNameException(info);
+        throw EvdevException(info);
     }
 
     // exactly one device
@@ -129,6 +129,7 @@ EvdevEncoder::EvdevEncoder(const std::string& search_name)
 
     m_evdev = devs[0];
     dump_device_info(m_evdev);
+    read();     // update counter
 }
 
 EvdevEncoder::~EvdevEncoder()
@@ -138,5 +139,14 @@ EvdevEncoder::~EvdevEncoder()
 
 int EvdevEncoder::read()
 {
-    return -1;
+    // Drain all queued events
+    struct input_event ev;
+    while (libevdev_next_event(m_evdev, LIBEVDEV_READ_FLAG_NORMAL, &ev) != -EAGAIN);
+    // (libevdev_next_event returns -EAGAIN when no events are available)
+
+    int current = libevdev_get_event_value(m_evdev, EV_ABS, ABS_X);
+    int diff = current - m_lastCount;
+    m_lastCount = current;
+    ROS_DEBUG("current axis value = %d, last = %d, diff = %d", current, m_lastCount, diff);
+    return diff;
 }
