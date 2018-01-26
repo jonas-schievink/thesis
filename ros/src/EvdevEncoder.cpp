@@ -1,14 +1,15 @@
 #include "EvdevEncoder.hpp"
 #include "Utils.hpp"
 
+#include <ros/console.h>
+
 #include <iostream>
 #include <vector>
 #include <cstring>
+#include <cassert>
 #include <dirent.h>
 #include <fcntl.h>
 
-using std::cout;
-using std::endl;
 using std::to_string;
 using std::strerror;
 
@@ -16,7 +17,7 @@ EvdevNameException::EvdevNameException(const std::string& what) :
     std::runtime_error(what) {}
 
 /**
- * Opens `dev_path` and matches the device name against `search_name`.
+ * @brief Opens `dev_path` and matches the device name against `search_name`.
  *
  * Returns the opened device or NULL when it doesn't match the search string.
  */
@@ -38,16 +39,41 @@ static struct libevdev* matchDevice(
     }
 
     std::string name = libevdev_get_name(dev);
-    cout << "device " << dev_path << " name is " << name;
 
     if (name.find(search_name) != std::string::npos)
     {
-        cout << " -> match" << endl;
+        ROS_DEBUG("matched evdev %s with name %s against pattern %s", dev_path.c_str(), name.c_str(), search_name.c_str());
         return dev;
     }
 
-    cout << " -> no match" << endl;
+    ROS_DEBUG("no match for evdev %s with name %s against pattern %s", dev_path.c_str(), name.c_str(), search_name.c_str());
     return NULL;
+}
+
+/**
+ * @brief Prints device informations to ROS' debug stream.
+ */
+static void dump_device_info(struct libevdev* dev)
+{
+    ROS_DEBUG("evdev info of %s", libevdev_get_name(dev));
+    ROS_DEBUG("unique identifier: %s", libevdev_get_uniq(dev));
+    ROS_DEBUG("PID:VID:  %d:%d", libevdev_get_id_product(dev), libevdev_get_id_vendor(dev));
+    ROS_DEBUG("device version: %d", libevdev_get_id_version(dev));
+    ROS_DEBUG("bustype: %d", libevdev_get_id_bustype(dev));
+
+    if (libevdev_has_event_type(dev, EV_ABS) &&
+        libevdev_has_event_code(dev, EV_ABS, ABS_X))
+    {
+        ROS_DEBUG("has EV_ABS with ABS_X");
+
+        ROS_DEBUG("X axis min/max: %d/%d",
+            libevdev_get_abs_minimum(dev, ABS_X),
+            libevdev_get_abs_maximum(dev, ABS_X));
+    } else {
+        ROS_WARN(
+            "device does not have EV_ABS with ABS_X (encoder "
+            "configuration is wrong, no data will be received)");
+    }
 }
 
 EvdevEncoder::EvdevEncoder(const std::string& search_name)
@@ -98,7 +124,16 @@ EvdevEncoder::EvdevEncoder(const std::string& search_name)
     }
 
     // exactly one device
+    assert(devs.size() == 1);
+    assert(devs[0] != nullptr);
+
     m_evdev = devs[0];
+    dump_device_info(m_evdev);
+}
+
+EvdevEncoder::~EvdevEncoder()
+{
+    libevdev_free(m_evdev);
 }
 
 int EvdevEncoder::read()

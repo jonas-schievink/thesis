@@ -20,7 +20,8 @@ public:
 /**
  * @brief A rotary encoder evdev
  *
- * This can be used to attach a Linux rotary-encoder device.
+ * This can be used to attach a Linux rotary-encoder device. The device must be
+ * configured to report events using the ABS_X axis (absolute axis).
  */
 class EvdevEncoder : public Encoder {
     struct libevdev* m_evdev;
@@ -30,7 +31,8 @@ public:
      * @brief Create a new evdev encoder by searching for an input device
      * @param search_name Device name the encoder has to match
      *
-     * This will search `/dev/input` for an input device matching `search_name`.
+     * This will search all `/dev/input/event*` devices for an input device
+     * whose name matches `search_name`.
      *
      * To figure out the device name, the `evtest` tool can be used.
      *
@@ -38,6 +40,8 @@ public:
      * will be thrown.
      */
     EvdevEncoder(const std::string& search_name);
+
+    ~EvdevEncoder();
 
     int read() override;
 };

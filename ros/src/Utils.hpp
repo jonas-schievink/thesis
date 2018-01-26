@@ -19,6 +19,12 @@ public:
     ~Guard() { m_func(); }
 };
 
+/**
+ * @brief Creates a guard object that invokes the given function when destroyed.
+ *
+ * This can be used for ad-hoc RAII with C functions without having to write
+ * an extra class.
+ */
 Guard make_guard(std::function<void()> what);
 
 #endif // UTILS_HPP
