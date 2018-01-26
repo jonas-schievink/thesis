@@ -11,7 +11,7 @@
 /*
 
 Future work:
-- Braking
+- Braking (should be possible by setting speed to 0 and reversing direction)
 - "Actual" speed integration (wheel m/s instead of 0% - 100%)
 
 */
@@ -28,16 +28,16 @@ public:
      * @brief Create a Motor object using speed and direction pins
      * @param speed_pin @ref Pin object controlling the motor speed via PWM
      * @param dir_pin @ref Pin object controlling the direction of the motor
-     * 
+     *
      * @ref speed_pin is assumed to turn on the motor when high (3.3V),
      * @ref dir_pin is assumed to make the motor turn backwards when high.
      */
     Motor(pigpio::Pin speed_pin, pigpio::Pin dir_pin);
 
     /**
-     * @brief Sets the speed and direction of the motor
+     * @brief Sets the target speed and direction of the motor
      * @param speed Speed of the motor as a float in range [-1.0, 1.0]
-     * 
+     *
      * If @ref speed parameter is negative, the motor will move backwards.
      * Otherwise, it will move forwards.
      */

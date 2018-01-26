@@ -8,13 +8,11 @@ find_library(pigpio_LIBRARY
     NAMES pigpio
     HINTS /usr/local/lib /usr/lib /lib)
 
-# Set the pigpio variables to plural form to make them accessible for
-# the paramount cmake modules.
+# Set the plural form variables
 set(pigpio_INCLUDE_DIRS ${pigpio_INCLUDE_DIR})
 set(pigpio_INCLUDES     ${pigpio_INCLUDE_DIR})
 
-# Handle REQUIRED, QUIET, and version arguments
-# and set the <packagename>_FOUND variable.
+# Handle REQUIRED, QUIET, and version arguments and set the <packagename>_FOUND variable.
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
     pigpio DEFAULT_MSG
