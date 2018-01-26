@@ -8,6 +8,7 @@
 #include <memory>
 #include <thread>
 #include <chrono>
+#include <cstdio>
 
 using std::cout;
 using std::endl;
@@ -35,12 +36,15 @@ int main(int argc, char** argv)
     process_args(argc, argv);
 
     try {
-        unique_ptr<Encoder> left(new EvdevEncoder("rot_left"));
-        unique_ptr<Encoder> right(new EvdevEncoder("rot_right"));
+        unique_ptr<Encoder> left(new EvdevEncoder("rot_left", 10000, true));
+        unique_ptr<Encoder> right(new EvdevEncoder("rot_right", 10000));
 
         while (true) {
-            cout << left->read() << endl;
-            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+            printf("%40s\r", "");
+            printf("--- L: %4d  R: %4d\r", left->read(), right->read());
+            fflush(stdout);
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     } catch (EvdevException ex) {
         ROS_ERROR("couldn't open encoder device: %s", ex.what());

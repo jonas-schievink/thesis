@@ -76,7 +76,8 @@ static void dump_device_info(struct libevdev* dev)
     }
 }
 
-EvdevEncoder::EvdevEncoder(const std::string& search_name)
+EvdevEncoder::EvdevEncoder(const std::string& search_name, int wrap, bool invert) :
+    m_wrap(wrap), m_invert(invert)
 {
     // Enumerate devices in /dev/input
     std::string basedir("/dev/input");
@@ -139,14 +140,39 @@ EvdevEncoder::~EvdevEncoder()
 
 int EvdevEncoder::read()
 {
-    // Drain all queued events
+    // Drain all queued events to update the internal state
     struct input_event ev;
     while (libevdev_next_event(m_evdev, LIBEVDEV_READ_FLAG_NORMAL, &ev) != -EAGAIN);
     // (libevdev_next_event returns -EAGAIN when no events are available)
 
     int current = libevdev_get_event_value(m_evdev, EV_ABS, ABS_X);
-    int diff = current - m_lastCount;
+    int last = m_lastCount;
     m_lastCount = current;
-    ROS_DEBUG("current axis value = %d, last = %d, diff = %d", current, m_lastCount, diff);
-    return diff;
+    ROS_DEBUG("current axis value = %d, last = %d, wrap = %d, invert = %d", current, last, m_wrap, m_invert);
+
+    // What theoretically is just `current - last` gets complicated due
+    // to wraparound of the counter. This works in modular arithmetic. We
+    // essentially have to consider 2 cases: No wraparound (the world in which
+    // `current - last` is correct), and wraparound. There is need to
+    // distinguish between different wrapping directions. Essentially, we "glue"
+    // the [0, wrap] interval below itself, subtract `wrap` from the larger of
+    // the 2 values, and re-do `current - last` with the modified values.
+    // Note that, in modular arithmetic, both ways are equally valid
+    // (they are said to be "congruent"). From those 2 differences, we then
+    // choose the smaller one, assuming that `read` gets called frequently
+    // enough to avoid extremely large readings.
+    int diff1 = current - last;
+    if (current > last)
+    {
+        current -= m_wrap;
+    }
+    else
+    {
+        last -= m_wrap;
+    }
+    int diff2 = current - last;
+    int diff = abs(diff1) < abs(diff2) ? diff1 : diff2;
+    ROS_DEBUG("diff1 = %d, diff2 = %d, diff = %d", diff1, diff2, diff);
+
+    return m_invert ? -diff : diff;
 }

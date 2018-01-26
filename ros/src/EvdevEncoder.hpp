@@ -26,11 +26,15 @@ public:
 class EvdevEncoder : public Encoder {
     struct libevdev* m_evdev;
     int m_lastCount;
+    int m_wrap;
+    bool m_invert;
 
 public:
     /**
      * @brief Create a new evdev encoder by searching for an input device
      * @param search_name Device name the encoder has to match
+     * @param wrap Number of steps after which the reported value wraps
+     * @param invert Whether to invert the direction
      *
      * This will search all `/dev/input/event*` devices for an input device
      * whose name matches `search_name`.
@@ -39,8 +43,11 @@ public:
      *
      * If no or more than 1 device matches the name, an `EvdevException`
      * will be thrown.
+     *
+     * The @ref wrap parameter must be kept in-sync with the device tree
+     * overlay.
      */
-    EvdevEncoder(const std::string& search_name);
+    EvdevEncoder(const std::string& search_name, int wrap, bool invert = false);
 
     ~EvdevEncoder();
 
