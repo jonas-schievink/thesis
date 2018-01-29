@@ -44,7 +44,7 @@ enum class PullUpDown {
 
 /**
  * @brief A GPIO pin.
- * 
+ *
  * This class encapsulates a single user-controllable pin on the Raspberry Pi's
  * expansion header and allows configuring, controlling and reading it.
  */
@@ -97,8 +97,27 @@ public:
     void pwm(unsigned int duty);
 
     /**
+     * @brief Gets the numerical range of the duty cycle
+     *
+     * The value passed to @ref pwm must be in this range.
+     */
+    int pwmRange() const;
+
+    /**
+     * @brief Gets the range actually used to perform PWM internally.
+     *
+     * This is the actual PWM resolution.
+     */
+    int pwmRealRange() const;
+
+    /**
+     * @brief Gets the PWM frequency of this pin in Hz.
+     */
+    int pwmFrequency() const;
+
+    /**
      * @brief Registers a callback to be called when the Pin level changes.
-     * 
+     *
      * If `f` is NULL, unregisters the callback.
      */
     void onChange(gpioAlertFuncEx_t f, void *userdata);

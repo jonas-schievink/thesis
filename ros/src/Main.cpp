@@ -36,12 +36,16 @@ int main(int argc, char** argv)
     process_args(argc, argv);
 
     try {
-        unique_ptr<Encoder> left(new EvdevEncoder("rot_left", 10000, true));
-        unique_ptr<Encoder> right(new EvdevEncoder("rot_right", 10000));
+        unique_ptr<RawEncoder> left(new EvdevEncoder("rot_left", 10000, true));
+        unique_ptr<RawEncoder> right(new EvdevEncoder("rot_right", 10000));
+        int l_sum = 0;
+        int r_sum = 0;
 
         while (true) {
             printf("%40s\r", "");
-            printf("--- L: %4d  R: %4d\r", left->read(), right->read());
+            l_sum += left->read();
+            r_sum += right->read();
+            printf("--- L: %4d  R: %4d\r", l_sum, r_sum);
             fflush(stdout);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));

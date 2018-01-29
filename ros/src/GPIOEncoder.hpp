@@ -7,14 +7,14 @@
 #define GPIOENCODER_HPP
 
 #include "PiGPIO.hpp"
-#include "Encoder.hpp"
+#include "RawEncoder.hpp"
 
 // TODO Document expected encoder behaviour wrt channel signals #A and #B
 
 /**
  * @brief A rotary encoder attached to two GPIO pins.
  */
-class GPIOEncoder : public Encoder {
+class GPIOEncoder : public RawEncoder {
     pigpio::Pin m_chan_a;
     pigpio::Pin m_chan_b;
     // last recorded level of A channel

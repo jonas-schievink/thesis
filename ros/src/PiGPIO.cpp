@@ -94,6 +94,21 @@ void Pin::pwm(unsigned int duty)
     check_retval(gpioPWM(m_num, duty));
 }
 
+int Pin::pwmRange() const
+{
+    return check_retval(gpioGetPWMrange(m_num));
+}
+
+int Pin::pwmRealRange() const
+{
+    return check_retval(gpioGetPWMrealRange(m_num));
+}
+
+int Pin::pwmFrequency() const
+{
+    return check_retval(gpioGetPWMfrequency(m_num));
+}
+
 void Pin::onChange(gpioAlertFuncEx_t f, void *userdata)
 {
     gpioSetAlertFuncEx(m_num, f, userdata);

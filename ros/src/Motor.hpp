@@ -17,11 +17,19 @@ Future work:
 */
 
 /**
- * @brief Controls speed and direction of a single motor using GPIOs
+ * @brief Controls speed and direction of a single motor using GPIOs.
+ *
+ * This class does *not* perform PID speed control, but it will prevent
+ * "dangerous" operations such as rapidly changing speed or direction.
  */
 class Motor {
     pigpio::Pin m_speed_pin;
     pigpio::Pin m_dir_pin;
+    /// Target speed [-1.0, 1.0]
+    float m_setpoint;
+
+    /// @brief Set motor speed without safety checks.
+    void set_direct(float speed);
 
 public:
     /**
@@ -42,6 +50,11 @@ public:
      * Otherwise, it will move forwards.
      */
     void set(float speed);
+
+    /**
+     * @brief Must be called in regular intervals to update the motor speed
+     */
+    void update();
 };
 
 #endif  // MOTOR_HPP

@@ -1,10 +1,10 @@
-#ifndef ENCODER_HPP
-#define ENCODER_HPP
+#ifndef RAWENCODER_HPP
+#define RAWENCODER_HPP
 
 /**
  * @brief Base class for rotary encoders.
  */
-class Encoder {
+class RawEncoder {
 public:
     /**
      * @brief Reads the number of counts since the last call to `read`
@@ -15,4 +15,4 @@ public:
     virtual int read() = 0;
 };
 
-#endif // ENCODER_HPP
+#endif // RAWENCODER_HPP
