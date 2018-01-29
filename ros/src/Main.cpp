@@ -10,6 +10,16 @@
 #include <chrono>
 #include <cstdio>
 
+/*
+ * -- Motors
+ * Left:
+ *  L_CTRL = 5
+ *  L_DIR = 6
+ * Right:
+ *  R_CTRL = 22
+ *  R_DIR = 23
+ */
+
 using std::cout;
 using std::endl;
 using std::unique_ptr;
@@ -36,19 +46,19 @@ int main(int argc, char** argv)
     process_args(argc, argv);
 
     try {
-        unique_ptr<RawEncoder> left(new EvdevEncoder("rot_left", 10000, true));
-        unique_ptr<RawEncoder> right(new EvdevEncoder("rot_right", 10000));
+        unique_ptr<RawEncoder> encLeft(new EvdevEncoder("rot_left", 10000, true));
+        unique_ptr<RawEncoder> encRight(new EvdevEncoder("rot_right", 10000));
         int l_sum = 0;
         int r_sum = 0;
 
         while (true) {
             printf("%40s\r", "");
-            l_sum += left->read();
-            r_sum += right->read();
+            l_sum += encLeft->read();
+            r_sum += encRight->read();
             printf("--- L: %4d  R: %4d\r", l_sum, r_sum);
             fflush(stdout);
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
     } catch (EvdevException ex) {
         ROS_ERROR("couldn't open encoder device: %s", ex.what());
