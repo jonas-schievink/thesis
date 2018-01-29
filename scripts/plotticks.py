@@ -80,6 +80,7 @@ if __name__ == "__main__":
 
 
     try:
+        # FIXME: Better: range(-steps, steps)?
         for step in range(steps):
             measurestep(step)
         for step in range(0, -steps):
@@ -88,4 +89,3 @@ if __name__ == "__main__":
     finally:
         encoder.stop()
         pi.stop()
-   
