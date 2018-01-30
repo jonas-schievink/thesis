@@ -18,41 +18,35 @@ using std::chrono::duration_cast;
 
 const static float DEFAULT_MAX_ACCEL = 0.3f;
 const static float DEFAULT_MAX_DIR_CHANGES = 1.0f;
+const static int DEFAULT_PWM_FREQ = 500; // Hz
+const static int DEFAULT_PWM_RANGE = 1000;
+const static int DEFAULT_MAX_DELTA = 200; // ms
 
-Motor::Motor(pigpio::Pin speed_pin, pigpio::Pin dir_pin) :
-    m_speed_pin(speed_pin), m_dir_pin(dir_pin),
+MotorConfig::MotorConfig(int ctrl_pin, int dir_pin) :
+    ctrl_pin(ctrl_pin),
+    direction_pin(dir_pin),
+    pwm_freq(DEFAULT_PWM_FREQ),
+    pwm_range(DEFAULT_PWM_RANGE),
+    max_delta_ms(DEFAULT_MAX_DELTA),
+    max_accel(DEFAULT_MAX_ACCEL),
+    max_dir_changes(DEFAULT_MAX_DIR_CHANGES)
+{
+}
+
+Motor::Motor(MotorConfig config) :
+    m_speed_pin(config.ctrl_pin),
+    m_dir_pin(config.direction_pin),
+    m_config(config),
     m_setpoint(0.0f),
     m_actual(0.0f),
-    m_maxAccel(DEFAULT_MAX_ACCEL),
-    m_dirChangeDelay(1.0f / DEFAULT_MAX_DIR_CHANGES)
+    m_dirChangeDelay(1.0f / config.max_dir_changes)
 {
-    m_pwmRange = m_speed_pin.pwmRange();
-    ROS_INFO("pwm freq = %d Hz, res = %d, real resolution = %d",
+    m_speed_pin.setPwmFrequency(m_config.pwm_freq);
+    m_pwmRange = m_speed_pin.setPwmRange(m_config.pwm_range);
+    ROS_INFO("requested freq = %d Hz, range = %d", m_config.pwm_freq, m_config.pwm_range);
+    ROS_INFO("actual pwm freq = %d Hz, range = %d",
         m_speed_pin.pwmFrequency(),
-        m_pwmRange,
-        m_speed_pin.pwmRealRange());
-}
-
-void Motor::setMaxAcceleration(float maxAccel)
-{
-    if (maxAccel < 0.0f)
-    {
-        string msg("maxAccel must be >0, was ");
-        msg += maxAccel;
-        throw std::invalid_argument(msg);
-    }
-
-    m_maxAccel = maxAccel;
-}
-
-void Motor::setMaxDirChanges(unsigned int changesPerSecond)
-{
-    if (changesPerSecond == 0)
-    {
-        throw std::invalid_argument("direction changes per second must be >0 (is 0)");
-    }
-
-    m_dirChangeDelay = 1.0f / (float) changesPerSecond;
+        m_pwmRange);
 }
 
 void Motor::set_direct(float speed)
@@ -81,7 +75,7 @@ void Motor::update()
     milliseconds delta = duration_cast<milliseconds>(m_lastUpdate - now);
     m_lastUpdate = now;
 
-    ROS_DEBUG("Motor::update: delta = %lld ms, diff = %f", delta.count(), diff);
+    ROS_DEBUG("Motor::update: delta = %lld ms, diff = %f, reached = %d", delta.count(), diff, reachedSetPoint());
     //set_direct(m_setpoint);
 }
 

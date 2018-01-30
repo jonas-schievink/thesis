@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <map>
+#include <cassert>
 
 namespace pigpio {
 
@@ -81,6 +82,8 @@ bool Pin::digitalRead() const
     case PI_TIMEOUT:
         // Watchdog timeout - Currently, watchdog support doesn't exist, so bail
         throw std::runtime_error("gpioRead reported watchdog timeout - watchdog is NYI");
+    default:
+        assert(0 && "Unreachable");
     }
 }
 
@@ -99,6 +102,11 @@ int Pin::pwmRange() const
     return check_retval(gpioGetPWMrange(m_num));
 }
 
+int Pin::setPwmRange(int range)
+{
+    return check_retval(gpioSetPWMrange(m_num, range));
+}
+
 int Pin::pwmRealRange() const
 {
     return check_retval(gpioGetPWMrealRange(m_num));
@@ -107,6 +115,11 @@ int Pin::pwmRealRange() const
 int Pin::pwmFrequency() const
 {
     return check_retval(gpioGetPWMfrequency(m_num));
+}
+
+int Pin::setPwmFrequency(int freq)
+{
+    return check_retval(gpioSetPWMfrequency(m_num, freq));
 }
 
 void Pin::onChange(gpioAlertFuncEx_t f, void *userdata)

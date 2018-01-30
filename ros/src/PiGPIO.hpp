@@ -104,6 +104,12 @@ public:
     int pwmRange() const;
 
     /**
+     * @brief Sets the PWM value range for this pin.
+     * @return Nearest supported (real) range that was set.
+     */
+    int setPwmRange(int range);
+
+    /**
      * @brief Gets the range actually used to perform PWM internally.
      *
      * This is the actual PWM resolution.
@@ -114,6 +120,12 @@ public:
      * @brief Gets the PWM frequency of this pin in Hz.
      */
     int pwmFrequency() const;
+
+    /**
+     * @brief Sets the PWM frequency of this pin in Hz.
+     * @return The nearest supported frequency that was actually set.
+     */
+    int setPwmFrequency(int freq);
 
     /**
      * @brief Registers a callback to be called when the Pin level changes.
