@@ -15,6 +15,7 @@ using std::string;
 using std::signbit;
 using std::chrono::milliseconds;
 using std::chrono::duration_cast;
+using std::chrono::high_resolution_clock;
 
 const static float DEFAULT_MAX_ACCEL = 0.3f;
 const static float DEFAULT_MAX_DIR_CHANGES = 1.0f;
@@ -41,6 +42,7 @@ Motor::Motor(MotorConfig config) :
     m_actual(0.0f),
     m_dirChangeDelay(1.0f / config.max_dir_changes)
 {
+    m_lastUpdate = high_resolution_clock::now();
     m_speed_pin.setPwmFrequency(m_config.pwm_freq);
     m_pwmRange = m_speed_pin.setPwmRange(m_config.pwm_range);
     ROS_INFO("requested freq = %d Hz, range = %d", m_config.pwm_freq, m_config.pwm_range);
@@ -71,8 +73,8 @@ void Motor::set(float speed)
 void Motor::update()
 {
     float diff = m_setpoint - m_actual; // total difference to go
-    Motor::UpdateTime now;
-    milliseconds delta = duration_cast<milliseconds>(m_lastUpdate - now);
+    Motor::UpdateTime now = high_resolution_clock::now();
+    milliseconds delta = duration_cast<milliseconds>(now - m_lastUpdate);
     m_lastUpdate = now;
 
     ROS_DEBUG("Motor::update: delta = %lld ms, diff = %f, reached = %d", delta.count(), diff, reachedSetPoint());
