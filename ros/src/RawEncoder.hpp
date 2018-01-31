@@ -10,7 +10,7 @@ public:
      * @brief Reads the number of counts since the last call to `read`
      *
      * If this is the first call to `read`, returns the number of counts since
-     * the creation of the `Encoder`.
+     * the creation of this instance.
      */
     virtual int read() = 0;
 };

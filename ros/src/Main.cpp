@@ -30,6 +30,9 @@ class Node
     ros::NodeHandle m_paramHandle;
     ros::Subscriber m_cmd_vel_sub;
     ros::Timer m_timer;
+    /// @brief Time of last msg received on `cmd_vel` topic.
+    ros::Time m_lastCmdVel;
+    float m_axisLength;
     unique_ptr<RawEncoder> m_encLeft;
     unique_ptr<RawEncoder> m_encRight;
     unique_ptr<Odometry> m_odom;
@@ -39,7 +42,8 @@ class Node
 public:
     Node() : m_handle(), m_paramHandle("~"),
         m_cmd_vel_sub(m_handle.subscribe("cmd_vel", 5, &Node::velCallback, this)),
-        m_timer(m_handle.createTimer(ros::Duration(0.02), &Node::timer, this))
+        m_timer(m_handle.createTimer(ros::Duration(0.02), &Node::timer, this)),
+        m_lastCmdVel(ros::Time::now())
     {
         // Setup encoders/odometry
         std::string left_encoder_pattern;
@@ -60,10 +64,9 @@ public:
         m_paramHandle.param("ticks_per_turn_of_wheel", ticks_per_turn_of_wheel, 5000);
         float wheel_perimeter;
         m_paramHandle.param("wheel_perimeter", wheel_perimeter, 0.379f);
-        float axis_length;
-        m_paramHandle.param("axis_length", axis_length, 0.28f);
+        m_paramHandle.param("axis_length", m_axisLength, 0.28f);
 
-        m_odom = unique_ptr<Odometry>(new Odometry(*m_encLeft, *m_encRight, ticks_per_turn_of_wheel, wheel_perimeter, axis_length));
+        m_odom = unique_ptr<Odometry>(new Odometry(*m_encLeft, *m_encRight, ticks_per_turn_of_wheel, wheel_perimeter, m_axisLength));
 
         // Set up motors
         int left_ctrl;
@@ -83,14 +86,34 @@ public:
 
     /**
      * @brief Called when a message on the `cmd_vel` topic is received.
+     *
+     * Note that a publisher might suddenly disappear, in which case we should
+     * reset velocity to 0 to prevent accidents.
+     *
+     * The original node used a timeout of 0.6 seconds after which velocity was
+     * reset. All remote control/teleop nodes seem to send update faster than
+     * that, so this seems fine.
+     *
+     * However, since KURT is so fast, we might want to reduce this timeout.
      */
     void velCallback(const geometry_msgs::Twist& msg)
     {
-        ROS_INFO("in cmd_vel callback");
+        m_lastCmdVel = ros::Time::now();
+
+        // Convert to left/right wheel speed.
+        // `angular.z` is the amount the robot should turn, `linear.x` is the
+        // linear speed in forward direction (since this message is always in
+        // robot-local coordinates).
+        float left  = msg.linear.x - m_axisLength * msg.angular.z;
+        float right = msg.linear.x + m_axisLength * msg.angular.z;
+        ROS_DEBUG("cmd_vel: %.2f | %.2f", left, right);
     }
 
     /**
-     * @brief called in regular update interval (>=50 Hz)
+     * @brief Called in regular intervals (>=50 Hz), updates complete node state.
+     *
+     * This will update odometry calculation and the motor controller, possibly
+     * publishing an odometry message.
      */
     void timer(const ros::TimerEvent& event)
     {
