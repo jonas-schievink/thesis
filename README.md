@@ -5,7 +5,7 @@ Das ist das Arbeits-Repository für meine Bachelorarbeit.
 ## Ordnerstruktur
 
 * `kernel`: Den Linux-Kernel betreffende Dateien (Device Tree Overlays, Treiber, etc.)
-* `node`: C++-Code, der später in einem ROS-Node landen soll - benutzt pigpio zur Ansteuerung der Motoren
+* `ros`: ROS-Package `kurtberry_pi`
 * `scripts`: Diverse Python-Scripts zum Testen
 
 ## Über das Setup
