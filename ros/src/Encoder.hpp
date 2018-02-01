@@ -1,6 +1,8 @@
 #ifndef ENCODER_HPP
 #define ENCODER_HPP
 
+#include <ros/time.h>
+
 /**
  * @brief Base class for rotary encoders.
  *
@@ -9,6 +11,13 @@
 class Encoder {
     /// @brief Ground distance the robot moves per encoder tick (approx.).
     double m_groundDistPerTick;
+
+    /// @brief Ground distance moved between the last 2 calls to @ref update.
+    double m_groundDist;
+    /// @brief Average speed between the last 2 calls to @ref update.
+    double m_speed;
+    /// @brief Time of the last update
+    ros::Time m_lastUpdate;
 
 protected:
     /**
@@ -31,9 +40,19 @@ protected:
 
 public:
     /**
-     * @brief Returns the ground distance covered since the last call
+     * @brief Returns the ground distance covered since the last @ref update call.
      */
-    double readGroundDist();
+    double groundDist();
+
+    /**
+     * @brief Returns the average speed since the last @ref update call.
+     */
+    double speed();
+
+    /**
+     * @brief Fetches and processes encoder readings, updating speed and ground distance.
+     */
+    void update();
 };
 
 #endif // ENCODER_HPP

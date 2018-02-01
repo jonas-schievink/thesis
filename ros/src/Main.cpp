@@ -162,9 +162,12 @@ public:
 
         m_motLeft->update();
         m_motRight->update();
+        m_encLeft->update();
+        m_encRight->update();
         m_odom->update();
+
         printf("%40s\r", "");
-        printf("    L: %.2f m/s  R: %.2f m/s\r", m_odom->speedLeft(), m_odom->speedRight());
+        printf("    L: %.2f m/s  R: %.2f m/s\r", m_encLeft->speed(), m_encRight->speed());
         fflush(stdout);
     }
 
