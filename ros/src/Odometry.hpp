@@ -1,7 +1,7 @@
 #ifndef ODOMETRY_HPP
 #define ODOMETRY_HPP
 
-class RawEncoder;
+class Encoder;
 
 /**
  * @brief Calculates odometry messages and speed in m/s from raw encoder data.
@@ -10,8 +10,8 @@ class RawEncoder;
  * motor (ground) speed.
  */
 class Odometry {
-    RawEncoder& m_left;
-    RawEncoder& m_right;
+    Encoder& m_left;
+    Encoder& m_right;
     /// @brief Encoder ticks per wheel turn.
     int m_ticksPerTurn;
     /// @brief Wheel perimeter in meters.
@@ -20,7 +20,7 @@ class Odometry {
     float m_axisLength;
 
 public:
-    Odometry(RawEncoder& left, RawEncoder& right, int ticksPerTurn, float wheelPerimeter, float axisLength);
+    Odometry(Encoder& left, Encoder& right, int ticksPerTurn, float wheelPerimeter, float axisLength);
 
     /**
      * @brief Calculates the latest value for ground speed of left wheels.

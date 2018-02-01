@@ -145,6 +145,7 @@ add_executable(${PROJECT_NAME}_node
     src/PiGPIO.cpp
     src/Utils.cpp
     src/Odometry.cpp
+    src/Encoder.cpp
 )
 
 ## Rename C++ executable without prefix

@@ -23,6 +23,25 @@ using std::endl;
 using std::unique_ptr;
 
 /**
+ * @brief Frequency of the node update timer.
+ */
+const static double TIMER_FREQ = 50; // Hz
+const static double TIMER_INTERVAL = 1.0 / TIMER_FREQ; // s
+
+/**
+ * @brief Safety timeout after which velocity will be reset if no cmd_vel is received.
+ */
+const static double CMD_VEL_TIMEOUT = 0.6; // s
+
+/**
+ * @brief ROS message queue size for the cmd_vel topic
+ *
+ * Since we're only interested in the most recent message, we can set this to 1
+ * to save a bit of space and improve controller latency.
+ */
+const static int CMD_VEL_QUEUE_SIZE = 1;
+
+/**
  * @brief ROS-Node, sets up subscribers, parameters, etc. and runs the main loop.
  */
 class Node
@@ -33,18 +52,20 @@ class Node
     ros::Timer m_timer;
     /// @brief Time of last msg received on `cmd_vel` topic.
     ros::Time m_lastCmdVel;
+    /// @brief cmd_vel message timeout after which velocity will be reset to 0.
+    ros::Duration m_cmdVelTimeout;
     float m_axisLength;
-    unique_ptr<RawEncoder> m_encLeft;
-    unique_ptr<RawEncoder> m_encRight;
+    unique_ptr<Encoder> m_encLeft;
+    unique_ptr<Encoder> m_encRight;
     unique_ptr<Odometry> m_odom;
     unique_ptr<Motor> m_motLeft;
     unique_ptr<Motor> m_motRight;
 
 public:
     Node() : m_handle(), m_paramHandle("~"),
-        m_cmd_vel_sub(m_handle.subscribe("cmd_vel", 5, &Node::velCallback, this)),
-        m_timer(m_handle.createTimer(ros::Duration(0.02), &Node::timer, this)),
-        m_lastCmdVel(ros::Time::now())
+        m_cmd_vel_sub(m_handle.subscribe("cmd_vel", CMD_VEL_QUEUE_SIZE, &Node::velCallback, this)),
+        m_timer(m_handle.createTimer(ros::Duration(TIMER_INTERVAL), &Node::timer, this)),
+        m_lastCmdVel(ros::Time::now()), m_cmdVelTimeout(CMD_VEL_TIMEOUT)
     {
         // Setup encoders/odometry
         std::string left_encoder_pattern;
@@ -58,14 +79,26 @@ public:
         m_paramHandle.param("right_encoder_invert", right_encoder_invert, false);
         m_paramHandle.param("encoder_wraparound", encoder_wraparound, 10000);
 
-        m_encLeft = unique_ptr<RawEncoder>(new EvdevEncoder(left_encoder_pattern, encoder_wraparound, left_encoder_invert));
-        m_encRight = unique_ptr<RawEncoder>(new EvdevEncoder(right_encoder_pattern, encoder_wraparound, right_encoder_invert));
-
         int ticks_per_turn_of_wheel;
         m_paramHandle.param("ticks_per_turn_of_wheel", ticks_per_turn_of_wheel, 5000);
         float wheel_perimeter;
         m_paramHandle.param("wheel_perimeter", wheel_perimeter, 0.379f);
         m_paramHandle.param("axis_length", m_axisLength, 0.28f);
+
+        m_encLeft = unique_ptr<Encoder>(new EvdevEncoder(
+            ticks_per_turn_of_wheel,
+            wheel_perimeter,
+            left_encoder_pattern,
+            encoder_wraparound,
+            left_encoder_invert
+        ));
+        m_encRight = unique_ptr<Encoder>(new EvdevEncoder(
+            ticks_per_turn_of_wheel,
+            wheel_perimeter,
+            right_encoder_pattern,
+            encoder_wraparound,
+            right_encoder_invert
+        ));
 
         m_odom = unique_ptr<Odometry>(new Odometry(*m_encLeft, *m_encRight, ticks_per_turn_of_wheel, wheel_perimeter, m_axisLength));
 
@@ -121,6 +154,12 @@ public:
      */
     void timer(const ros::TimerEvent& event)
     {
+        ros::Duration lastCmdDelay = ros::Time::now() - m_lastCmdVel;
+        if (lastCmdDelay > m_cmdVelTimeout)
+        {
+            ROS_DEBUG("no cmd_vel received, resetting speed to 0");
+        }
+
         m_motLeft->update();
         m_motRight->update();
         m_odom->update();

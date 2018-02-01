@@ -1,7 +1,7 @@
 #ifndef EVDEVENCODER_HPP
 #define EVDEVENCODER_HPP
 
-#include "RawEncoder.hpp"
+#include "Encoder.hpp"
 
 #include <libevdev/libevdev.h>
 
@@ -23,7 +23,7 @@ public:
  * This can be used to attach a Linux rotary-encoder device. The device must be
  * configured to report events using the ABS_X axis (absolute axis).
  */
-class EvdevEncoder : public RawEncoder {
+class EvdevEncoder : public Encoder {
     struct libevdev* m_evdev;
     int m_lastCount;
     int m_wrap;
@@ -47,10 +47,11 @@ public:
      * The @ref wrap parameter must be kept in-sync with the device tree
      * overlay.
      */
-    EvdevEncoder(const std::string& search_name, int wrap, bool invert = false);
+    EvdevEncoder(int ticksPerTurn, float wheelPerimeter, const std::string& search_name, int wrap, bool invert = false);
 
     ~EvdevEncoder();
 
+protected:
     int read() override;
 };
 

@@ -76,7 +76,8 @@ static void dump_device_info(struct libevdev* dev)
     }
 }
 
-EvdevEncoder::EvdevEncoder(const std::string& search_name, int wrap, bool invert) :
+EvdevEncoder::EvdevEncoder(int ticksPerTurn, float wheelPerimeter, const std::string& search_name, int wrap, bool invert) :
+    Encoder(ticksPerTurn, wheelPerimeter),
     m_wrap(wrap), m_invert(invert)
 {
     // Enumerate devices in /dev/input
