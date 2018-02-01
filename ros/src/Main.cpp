@@ -100,7 +100,7 @@ public:
             right_encoder_invert
         ));
 
-        m_odom = unique_ptr<Odometry>(new Odometry(*m_encLeft, *m_encRight, ticks_per_turn_of_wheel, wheel_perimeter, m_axisLength));
+        m_odom = unique_ptr<Odometry>(new Odometry(m_handle, *m_encLeft, *m_encRight, m_axisLength));
 
         // Set up motors
         int left_ctrl;
@@ -147,7 +147,7 @@ public:
     }
 
     /**
-     * @brief Called in regular intervals (>=50 Hz), updates complete node state.
+     * @brief Called in regular intervals, updates complete node state.
      *
      * This will update odometry calculation and the motor controller, possibly
      * publishing an odometry message.

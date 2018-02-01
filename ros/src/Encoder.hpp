@@ -45,7 +45,7 @@ public:
     double groundDist();
 
     /**
-     * @brief Returns the average speed since the last @ref update call.
+     * @brief Returns the average speed in m/s since the last @ref update call.
      */
     double speed();
 
