@@ -10,6 +10,7 @@
 #include <thread>
 #include <chrono>
 #include <cstdio>
+#include <signal.h>
 
 // Pin defaults, can be overridden via config
 #define PIN_L_CTRL 5
@@ -84,6 +85,9 @@ public:
         m_motRight = unique_ptr<Motor>(new Motor(rightCfg));
     }
 
+    Node(const Node& other) = delete;
+    Node& operator=(const Node& other) = delete;
+
     /**
      * @brief Called when a message on the `cmd_vel` topic is received.
      *
@@ -146,14 +150,31 @@ static void process_args(int argc, char** argv)
     }
 }
 
+/**
+ * @brief Restores the default SIGINT handler.
+ *
+ * Despite being told explicitly not to do so via
+ * `ros::init_options::NoSigintHandler`, ROS will register a signal handler for
+ * SIGINT upon node handle creation. That handler, however, doesn't work right
+ * and requires pressing Ctrl+C twice.
+ *
+ * This function will override the ROS handler and restores the default
+ * behaviour.
+ */
+static void stop_hijacking_the_fucking_signal_handler()
+{
+    signal(SIGINT, SIG_DFL);
+}
+
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "kurtberry_pi_node");
+    ros::init(argc, argv, "kurtberry_pi_node", ros::init_options::NoSigintHandler);
 
     process_args(argc, argv);
 
     try {
         Node n;
+        stop_hijacking_the_fucking_signal_handler();
         n.run();
     } catch (const EvdevException& ex) {
         ROS_ERROR("couldn't open encoder device: %s", ex.what());
