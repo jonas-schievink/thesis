@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="kurtberry_pi" type="kurtberry_pi_node" name="kurtberry_pi_node" output="screen"></node>
+</launch>
