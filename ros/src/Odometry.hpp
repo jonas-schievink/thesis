@@ -2,20 +2,10 @@
 #define ODOMETRY_HPP
 
 #include <ros/node_handle.h>
+#include <nav_msgs/Odometry.h>
+#include <sensor_msgs/JointState.h>
 
 class Encoder;
-
-/**
- * @brief Relative robot movement (linear and angular)
- */
-struct OdomMovement {
-    /// @brief Forward movement in meters.
-    double forward;
-    /// @brief Rightward movement in meters (positive values = to the right).
-    double rightward;
-    /// @brief Clockwise rotation (to the right) in Radians.
-    double angular;
-};
 
 /**
  * @brief Calculates odometry messages from left/right encoders.
@@ -28,8 +18,24 @@ class Odometry {
     float m_axisLength;
     /// @brief `/odom` publisher.
     ros::Publisher m_odomPub;
+    /// @brief `/joint_states` publisher.
+    ros::Publisher m_jointPub;
 
-    OdomMovement calcMovement();
+    double m_x;
+    double m_y;
+    double m_theta;
+
+    /// @brief Rotation angle of left wheel (-Pi .. +Pi)
+    double m_leftWheel;
+    /// @brief Rotation angle of right wheel (-Pi .. +Pi)
+    double m_rightWheel;
+
+    void calcJointState(sensor_msgs::JointState*);
+
+    /**
+     * @brief populates pose and twist of the Odometry message.
+     */
+    void calcMovement(nav_msgs::Odometry*);
 
 public:
     /**

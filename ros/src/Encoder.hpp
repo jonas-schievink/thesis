@@ -9,12 +9,12 @@
  * Subclasses only need to implement `read` and call the constructor.
  */
 class Encoder {
+    int m_ticksPerTurn;
     /// @brief Ground distance the robot moves per encoder tick (approx.).
     double m_groundDistPerTick;
 
-    /// @brief Ground distance moved between the last 2 calls to @ref update.
+    double m_revolutions;
     double m_groundDist;
-    /// @brief Average speed between the last 2 calls to @ref update.
     double m_speed;
     /// @brief Time of the last update
     ros::Time m_lastUpdate;
@@ -42,12 +42,17 @@ public:
     /**
      * @brief Returns the ground distance covered since the last @ref update call.
      */
-    double groundDist();
+    double groundDist() const;
 
     /**
      * @brief Returns the average speed in m/s since the last @ref update call.
      */
-    double speed();
+    double speed() const;
+
+    /**
+     * @brief Returns the number of wheel revolutions since last @ref update call.
+     */
+    double revolutions() const;
 
     /**
      * @brief Fetches and processes encoder readings, updating speed and ground distance.
