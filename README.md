@@ -1,11 +1,10 @@
-# Der KURTberry Pi
+# ROS-Package `kurtberry_pi`
 
-Das ist das Arbeits-Repository für meine Bachelorarbeit.
+Enthält Teile von [`kurt_driver`](https://github.com/uos/kurt_driver).
 
 ## Ordnerstruktur
 
 * `kernel`: Den Linux-Kernel betreffende Dateien (Device Tree Overlays, Treiber, etc.)
-* `ros`: ROS-Package `kurtberry_pi`
 * `scripts`: Diverse Python-Scripts zum Testen
 
 ## Über das Setup
@@ -64,7 +63,7 @@ Kompilieren kann man eine SSH-Sitzung öffnen.
 
 ### ROS
 
-Das ROS-Package in `ros` wurde in den Catkin-Workspace `~/catkin_ws` gelinkt:
+Das ROS-Package wurde in den Catkin-Workspace `~/catkin_ws` gelinkt:
 
     ln -s ~/kurtberry-pi/ros ~/catkin_ws/src/kurtberry_pi
 
