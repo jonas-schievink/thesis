@@ -137,7 +137,7 @@ public:
     {
         m_lastCmdVel = ros::Time::now();
 
-        // Convert to left/right wheel speed.
+        // Convert to left/right wheel ground speed (m/s).
         // `angular.z` is the amount the robot should turn, `linear.x` is the
         // linear speed in forward direction (since this message is always in
         // robot-local coordinates).
