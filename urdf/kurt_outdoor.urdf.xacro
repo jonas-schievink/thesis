@@ -6,7 +6,7 @@
   name="kurt_outdoor_base">
 
   <xacro:include filename="$(find uos_common_urdf)/common.xacro" />
-  <xacro:include filename="$(find kurt_base)/urdf/infrared_sonar.urdf.xacro" />
+  <xacro:include filename="$(find kurtberry_pi)/urdf/infrared_sonar.urdf.xacro" />
   <xacro:include filename="$(find uos_common_urdf)/urdf/imu.gazebo.urdf.xacro" />
 
   <xacro:property name="wheel_width" value="0.046" />
@@ -23,7 +23,7 @@
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kurt_base/meshes/kurt_base_outdoor.stl" />
+        <mesh filename="package://kurtberry_pi/meshes/kurt_base_outdoor.stl" />
       </geometry>
 
       <material name="red" >
@@ -33,7 +33,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>
-        <mesh filename="package://kurt_base/meshes/kurt_base_outdoor.stl" />
+        <mesh filename="package://kurtberry_pi/meshes/kurt_base_outdoor.stl" />
       </geometry>
     </collision>
     <!-- <visual>
@@ -99,7 +99,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kurt_base/meshes/kurt_wheel_outdoor.stl" />
+          <mesh filename="package://kurtberry_pi/meshes/kurt_wheel_outdoor.stl" />
         </geometry>
 
         <material name="blackish"><color rgba="0.1 0.1 0.1 1"/></material>
@@ -107,7 +107,7 @@
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <mesh filename="package://kurt_base/meshes/kurt_wheel_outdoor.stl" />
+          <mesh filename="package://kurtberry_pi/meshes/kurt_wheel_outdoor.stl" />
           <!-- <cylinder length="${wheel_width}" radius="${wheel_radius}" /> -->
         </geometry>
       </collision>
