@@ -1,4 +1,8 @@
 <?xml version="1.0"?>
 <launch>
-    <node pkg="kurtberry_pi" type="kurtberry_pi_node" name="kurtberry_pi_node" output="screen"></node>
+    <param name="robot_description" command="$(find xacro)/xacro '$(find kurtberry_pi)/urdf/kurt_indoor.urdf.xacro'" />
+    <node pkg="kurtberry_pi" type="kurtberry_pi_node" name="kurtberry_pi_node" output="screen">
+        <!-- <param>s here (if needed) -->
+    </node>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
 </launch>
