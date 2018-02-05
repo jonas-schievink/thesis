@@ -65,7 +65,7 @@ Kompilieren kann man eine SSH-Sitzung öffnen.
 
 Das ROS-Package wurde in den Catkin-Workspace `~/catkin_ws` gelinkt:
 
-    ln -s ~/kurtberry-pi/ros ~/catkin_ws/src/kurtberry_pi
+    ln -s ~/kurtberry-pi ~/catkin_ws/src/kurtberry_pi
 
 Ausführen:
 
