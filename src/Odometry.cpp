@@ -14,9 +14,9 @@ Odometry::Odometry(ros::NodeHandle node, Encoder& left, Encoder& right, float ax
 
 void Odometry::update()
 {
-    nav_msgs::Odometry odom;
+    /*nav_msgs::Odometry odom;
     calcMovement(&odom);
-    m_odomPub.publish(odom);
+    m_odomPub.publish(odom);*/
 
     sensor_msgs::JointState joints;
     calcJointState(&joints);

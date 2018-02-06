@@ -37,7 +37,7 @@ public:
      * The pins will not be reconfigured. You must configure pullups as
      * appropriate before creating the `Encoder`.
      */
-    GPIOEncoder(int ticksPerTurn, float wheelPerimeter, pigpio::Pin chan_a, pigpio::Pin chan_b);
+    GPIOEncoder(int ticksPerTurn, pigpio::Pin chan_a, pigpio::Pin chan_b);
 
 protected:
     int read() override;

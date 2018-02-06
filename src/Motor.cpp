@@ -28,9 +28,7 @@ MotorConfig::MotorConfig(int ctrl_pin, int dir_pin) :
     direction_pin(dir_pin),
     pwm_freq(DEFAULT_PWM_FREQ),
     pwm_range(DEFAULT_PWM_RANGE),
-    max_delta_ms(DEFAULT_MAX_DELTA),
-    max_accel(DEFAULT_MAX_ACCEL),
-    max_dir_changes(DEFAULT_MAX_DIR_CHANGES)
+    max_delta_ms(DEFAULT_MAX_DELTA)
 {
 }
 
@@ -38,8 +36,6 @@ Motor::Motor(MotorConfig config) :
     m_speed_pin(config.ctrl_pin),
     m_dir_pin(config.direction_pin),
     m_config(config),
-    m_setpoint(0.0f),
-    m_actual(0.0f),
     m_dirChangeDelay(1.0f / config.max_dir_changes)
 {
     m_lastUpdate = high_resolution_clock::now();
@@ -72,13 +68,7 @@ void Motor::set(float speed)
 
 void Motor::update()
 {
-    float diff = m_setpoint - m_actual; // total difference to go
-    Motor::UpdateTime now = high_resolution_clock::now();
-    milliseconds delta = duration_cast<milliseconds>(now - m_lastUpdate);
-    m_lastUpdate = now;
-
-    ROS_DEBUG("Motor::update: delta = %lld ms, diff = %f, reached = %d", delta.count(), diff, reachedSetPoint());
-    //set_direct(m_setpoint);
+    set_direct(m_setpoint);
 }
 
 bool Motor::reachedSetPoint() const

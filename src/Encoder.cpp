@@ -1,9 +1,8 @@
 #include "Encoder.hpp"
 
-Encoder::Encoder(int ticksPerTurn, float wheelPerimeter) :
-    m_ticksPerTurn(ticksPerTurn),
-    m_groundDistPerTick(static_cast<double>(wheelPerimeter) / static_cast<double>(ticksPerTurn)),
-    m_revolutions(0.0), m_groundDist(0.0), m_speed(0.0), m_lastUpdate(ros::Time::now()) {}
+Encoder::Encoder(int ticksPerTurn) :
+    m_ticksPerTurn(ticksPerTurn), m_radians(0.0), m_totalRadians(0.0),
+    m_lastUpdate(ros::Time::now()) {}
 
 double Encoder::groundDist() const
 {
@@ -20,6 +19,16 @@ double Encoder::revolutions() const
     return m_revolutions;
 }
 
+double Encoder::radians() const
+{
+    return m_radians;
+}
+
+double Encoder::totalRadians() const
+{
+    return m_totalRadians;
+}
+
 void Encoder::update()
 {
     ros::Time now = ros::Time::now();
@@ -30,4 +39,10 @@ void Encoder::update()
     m_revolutions = ticks / static_cast<double>(m_ticksPerTurn);
     m_groundDist = ticks * m_groundDistPerTick;
     m_speed = m_groundDist / delta.toSec();
+
+    m_radians = ticks / static_cast<double>(m_ticksPerTurn) * 2.0 * M_PI;
+    m_totalRadians += m_radians;
+
+    //if (m_radians < -M_PI) m_radians += 2.0 * M_PI;
+    //if (m_radians >  M_PI) m_radians -= 2.0 * M_PI;
 }

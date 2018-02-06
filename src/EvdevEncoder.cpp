@@ -76,8 +76,8 @@ static void dump_device_info(struct libevdev* dev)
     }
 }
 
-EvdevEncoder::EvdevEncoder(int ticksPerTurn, float wheelPerimeter, const std::string& search_name, int wrap, bool invert) :
-    Encoder(ticksPerTurn, wheelPerimeter),
+EvdevEncoder::EvdevEncoder(int ticksPerTurn, const std::string& search_name, int wrap, bool invert) :
+    Encoder(ticksPerTurn),
     m_wrap(wrap), m_invert(invert)
 {
     // Enumerate devices in /dev/input
@@ -149,7 +149,7 @@ int EvdevEncoder::read()
     int current = libevdev_get_event_value(m_evdev, EV_ABS, ABS_X);
     int last = m_lastCount;
     m_lastCount = current;
-    ROS_DEBUG("current axis value = %d, last = %d, wrap = %d, invert = %d", current, last, m_wrap, m_invert);
+    //ROS_DEBUG("current axis value = %d, last = %d, wrap = %d, invert = %d", current, last, m_wrap, m_invert);
 
     // What theoretically is just `current - last` gets complicated due
     // to wraparound of the counter. This works in modular arithmetic. We
@@ -173,7 +173,7 @@ int EvdevEncoder::read()
     }
     int diff2 = current - last;
     int diff = abs(diff1) < abs(diff2) ? diff1 : diff2;
-    ROS_DEBUG("diff1 = %d, diff2 = %d, diff = %d", diff1, diff2, diff);
+    //ROS_DEBUG("diff1 = %d, diff2 = %d, diff = %d", diff1, diff2, diff);
 
     return m_invert ? -diff : diff;
 }

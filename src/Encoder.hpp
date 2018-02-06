@@ -16,6 +16,8 @@ class Encoder {
     double m_revolutions;
     double m_groundDist;
     double m_speed;
+    double m_radians;
+    double m_totalRadians;
     /// @brief Time of the last update
     ros::Time m_lastUpdate;
 
@@ -25,7 +27,7 @@ protected:
      * @param ticksPerTurn Encoder ticks reported per wheel turn
      * @param wheelPerimeter Wheel perimeter in meters
      */
-    Encoder(int ticksPerTurn, float wheelPerimeter);
+    Encoder(int ticksPerTurn);
 
     Encoder(const Encoder& other) = delete;
     Encoder& operator=(const Encoder& other) = delete;
@@ -53,6 +55,10 @@ public:
      * @brief Returns the number of wheel revolutions since last @ref update call.
      */
     double revolutions() const;
+
+    double radians() const;
+
+    double totalRadians() const;
 
     /**
      * @brief Fetches and processes encoder readings, updating speed and ground distance.

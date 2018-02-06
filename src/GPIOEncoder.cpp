@@ -46,8 +46,8 @@ void GPIOEncoder::pulse(int pin_num, int level)
     }
 }
 
-GPIOEncoder::GPIOEncoder(int ticksPerTurn, float wheelPerimeter, pigpio::Pin chan_a, pigpio::Pin chan_b)
-: Encoder(ticksPerTurn, wheelPerimeter), m_chan_a(chan_a), m_chan_b(chan_b), m_lvlA(0), m_lvlB(0), m_lastGpio(chan_a.number()),
+GPIOEncoder::GPIOEncoder(int ticksPerTurn, pigpio::Pin chan_a, pigpio::Pin chan_b)
+: Encoder(ticksPerTurn), m_chan_a(chan_a), m_chan_b(chan_b), m_lvlA(0), m_lvlB(0), m_lastGpio(chan_a.number()),
   m_relcount(0) {
     m_chan_a.onChange(GPIOEncoder::pulse_helper, this);
     m_chan_b.onChange(GPIOEncoder::pulse_helper, this);

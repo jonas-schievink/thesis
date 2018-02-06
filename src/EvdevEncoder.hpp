@@ -47,7 +47,7 @@ public:
      * The @ref wrap parameter must be kept in-sync with the device tree
      * overlay.
      */
-    EvdevEncoder(int ticksPerTurn, float wheelPerimeter, const std::string& search_name, int wrap, bool invert = false);
+    EvdevEncoder(int ticksPerTurn, const std::string& search_name, int wrap, bool invert = false);
 
     ~EvdevEncoder();
 

@@ -13,7 +13,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp)
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  hardware_interface
+  controller_manager
+)
 
 ## System dependencies are found with CMake's conventions
 find_package(PiGPIO REQUIRED)
@@ -146,6 +150,7 @@ add_executable(${PROJECT_NAME}_node
     src/Utils.cpp
     src/Odometry.cpp
     src/Encoder.cpp
+    src/Kurt.cpp
 )
 
 ## Rename C++ executable without prefix
