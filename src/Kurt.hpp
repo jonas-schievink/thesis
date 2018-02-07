@@ -39,6 +39,7 @@ public:
      */
     void write();
 
+    // Receives the control effort from the PID controllers.
     void leftCtrl(const std_msgs::Float64& msg);
     void rightCtrl(const std_msgs::Float64& msg);
 
