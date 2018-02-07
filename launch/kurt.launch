@@ -30,13 +30,18 @@
     <node name="default_controller_spawner" pkg="controller_manager" type="spawner" output="screen"
       args="joint_state_controller diffdrive" />
 
+    <!-- Redirect /cmd_vel to /diffdrive/cmd_vel. The controller spawner can't remap for us. -->
+    <node name="cmd_vel_relay" pkg="topic_tools" type="relay" args="/cmd_vel /diffdrive/cmd_vel" />
+
     <node name="left_pid" pkg="pid" type="controller" ns="left_pid" output="screen">
         <param name="upper_limit" value="1.0" />
         <param name="lower_limit" value="-1.0" />
+        <param name="Kp" value="0.1" />
     </node>
 
     <node name="right_pid" pkg="pid" type="controller" ns="right_pid" output="screen">
         <param name="upper_limit" value="1.0" />
         <param name="lower_limit" value="-1.0" />
+        <param name="Kp" value="0.1" />
     </node>
 </launch>
