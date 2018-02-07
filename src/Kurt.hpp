@@ -2,6 +2,7 @@
 #define KURT_HPP
 
 #include "Encoder.hpp"
+#include "Odometry.hpp"
 #include "Motor.hpp"
 
 #include <hardware_interface/robot_hw.h>
@@ -42,10 +43,16 @@ public:
     void rightCtrl(const std_msgs::Float64& msg);
 
 private:
+    double leftSpeed() const;
+    double rightSpeed() const;
+
     std::unique_ptr<Encoder> m_encLeft;
     std::unique_ptr<Encoder> m_encRight;
+    std::unique_ptr<Odometry> m_odom;
     std::unique_ptr<Motor> m_motLeft;
     std::unique_ptr<Motor> m_motRight;
+    double m_left;
+    double m_right;
 
     ros::Publisher m_leftSetpoint;
     ros::Publisher m_rightSetpoint;

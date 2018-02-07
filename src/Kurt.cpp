@@ -11,7 +11,7 @@ using std::unique_ptr;
 #define PIN_R_CTRL 22
 #define PIN_R_DIR  23
 
-Kurt::Kurt(ros::NodeHandle& nh)
+Kurt::Kurt(ros::NodeHandle& nh) : m_left(0.0), m_right(0.0)
 {
     cmd[0] = cmd[1] = 0.0;
     pos[0] = pos[1] = 0.0;
@@ -47,6 +47,7 @@ Kurt::Kurt(ros::NodeHandle& nh)
         encoder_wraparound,
         right_encoder_invert
     ));
+    m_odom = unique_ptr<Odometry>(new Odometry(nh, *m_encLeft, *m_encRight, 1.0f));
 
     // Set up motors
     int left_ctrl;
@@ -93,8 +94,18 @@ void Kurt::update()
 {
     m_encLeft->update();
     m_encRight->update();
+    //m_odom->update();
+
+    if (false) // FIXME: Add --dryrun parameter/arg
+    {
+        m_motLeft->set(m_left);
+        m_motRight->set(m_right);
+    }
+
     m_motLeft->update();
     m_motRight->update();
+
+    ROS_DEBUG("L vel = %f rad/s, L cmd = %f, L effort = %f", leftSpeed(), cmd[0], m_left);
 }
 
 void Kurt::read() const
@@ -108,9 +119,9 @@ void Kurt::read() const
 
     // also send state in radians / second so the controller can do work
     std_msgs::Float64 state;
-    state.data = m_encLeft->radians() / getPeriod().toSec();
+    state.data = leftSpeed();
     m_leftState.publish(state);
-    state.data = m_encRight->radians() / getPeriod().toSec();
+    state.data = rightSpeed();
     m_rightState.publish(state);
 }
 
@@ -119,18 +130,28 @@ void Kurt::write()
     // write wheel rotations to vars
     pos[0] = m_encLeft->totalRadians();
     pos[1] = m_encRight->totalRadians();
-    vel[0] = pos[0] / getPeriod().toSec();
-    vel[1] = pos[1] / getPeriod().toSec();
+    vel[0] = leftSpeed();
+    vel[1] = rightSpeed();
 }
 
 void Kurt::leftCtrl(const std_msgs::Float64& msg)
 {
-    m_motLeft->set(msg.data);
+    m_left = msg.data;
 }
 
 void Kurt::rightCtrl(const std_msgs::Float64& msg)
 {
-    m_motRight->set(msg.data);
+    m_right = msg.data;
+}
+
+double Kurt::leftSpeed() const
+{
+    return m_encLeft->radians() / getPeriod().toSec();
+}
+
+double Kurt::rightSpeed() const
+{
+    return m_encRight->radians() / getPeriod().toSec();
 }
 
 ros::Duration Kurt::getPeriod() const
