@@ -43,7 +43,16 @@ public:
     void rightCtrl(const std_msgs::Float64& msg);
 
 private:
+    /**
+     * @brief Calculates the speed of the left wheel in rad/s since the last
+     * encoder update.
+     */
     double leftSpeed() const;
+
+    /**
+     * @brief Calculates the speed of the right wheel in rad/s since the last
+     * encoder update.
+     */
     double rightSpeed() const;
 
     std::unique_ptr<Encoder> m_encLeft;
