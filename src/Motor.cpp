@@ -36,6 +36,8 @@ Motor::Motor(MotorConfig config) :
     m_speed_pin(config.ctrl_pin),
     m_dir_pin(config.direction_pin),
     m_config(config),
+    m_setpoint(0.0f),
+    m_actual(0.0f),
     m_dirChangeDelay(1.0f / config.max_dir_changes)
 {
     m_lastUpdate = high_resolution_clock::now();
@@ -49,9 +51,11 @@ Motor::Motor(MotorConfig config) :
 
 void Motor::set_direct(float speed)
 {
-    bool backwards = speed < 0.0f;
-    m_dir_pin.digitalWrite(backwards);
-    m_speed_pin.pwm((unsigned int) (abs(speed) * float(m_pwmRange)));
+    if (fabs(speed) > 0.001f) {
+        bool backwards = speed < 0.0f;
+        m_dir_pin.digitalWrite(backwards);
+    }
+    m_speed_pin.pwm((unsigned int) (fabs(speed) * float(m_pwmRange)));
 }
 
 void Motor::set(float speed)
