@@ -105,7 +105,7 @@ void Kurt::update()
     m_motLeft->update();
     m_motRight->update();
 
-    ROS_DEBUG("L vel = %f rad/s, L cmd = %f, L effort = %f", leftSpeed(), cmd[0], m_left);
+    ROS_DEBUG("L vel = %f rad/s, L cmd = %f rad/s, L effort = %f", leftSpeed(), cmd[0], m_left);
 }
 
 void Kurt::read() const
@@ -156,5 +156,5 @@ double Kurt::rightSpeed() const
 
 ros::Duration Kurt::getPeriod() const
 {
-    return ros::Duration(0.01);
+    return ros::Duration(0.05);
 }
