@@ -36,12 +36,14 @@
     <node name="left_pid" pkg="pid" type="controller" ns="left_pid" output="screen">
         <param name="upper_limit" value="1.0" />
         <param name="lower_limit" value="-1.0" />
-        <param name="Kp" value="0.1" />
+        <param name="Kp" value="0.05" />
+        <param name="Ki" value="0.1" />
     </node>
 
     <node name="right_pid" pkg="pid" type="controller" ns="right_pid" output="screen">
         <param name="upper_limit" value="1.0" />
         <param name="lower_limit" value="-1.0" />
-        <param name="Kp" value="0.1" />
+        <param name="Kp" value="0.05" />
+        <param name="Ki" value="0.1" />
     </node>
 </launch>
