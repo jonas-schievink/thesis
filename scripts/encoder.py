@@ -1,21 +1,22 @@
 #!/usr/bin/python3
 
 """
-This is a module providing access to KURT's rotary encoders attached to GPIOs.
+This is a module providing access to KURT's rotary encoders attached to GPIOs or
+via evdev (see kernel directory).
 
-It can also be invoked directly, in which case it displays the counts of an encoder.
-
-It does *not* work if the encoders are integrated using the device-tree overlay
-and rotary-enoder driver.
+It can also be invoked directly, in which case it displays the counts of an
+encoder.
 """
 
 import argparse
 import time
 import sys
 import pigpio
+from evdev import InputDevice, ecodes
+from threading import Thread
 
 
-class Encoder:
+class GPIOEncoder:
     """
     Counts ticks of a rotary encoder.
     """
@@ -77,39 +78,97 @@ class Encoder:
         self._cb_b.cancel()
 
 
+class EvdevEncoder:
+    count = 0
+    wrap = 10000  # number of reported counts is mod this
+    _dev = None
+    _thread = None
+    _rawcount = None
+
+    def __init__(self, dev):
+        self._dev = InputDevice(dev)
+        self._thread = Thread(target=EvdevEncoder.eventThread, args=(self,))
+        self._thread.daemon = True
+        self._thread.start()
+
+    def eventThread(self):
+        for event in self._dev.read_loop():
+            if event.type == ecodes.EV_ABS and event.code == ecodes.ABS_X:
+                if self._rawcount is None:
+                    self._rawcount = event.value
+                    continue
+
+                current = event.value
+                last = self._rawcount
+                self._rawcount = current
+
+                diff1 = current - last
+                if current > last:
+                    current -= self.wrap
+                else:
+                    last -= self.wrap
+                diff2 = current - last
+                if abs(diff1) < abs(diff2):
+                    diff = diff1
+                else:
+                    diff = diff2
+                self.count += diff
+
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Read a rotary encoder connected to 2 GPIOs')
-    parser.add_argument('ch_a', metavar='CH_A', type=int, nargs=1, help='Channel A GPIO (BCM numbering)')
-    parser.add_argument('ch_b', metavar='CH_B', type=int, nargs=1, help='Channel B GPIO (BCM numbering)')
-    parser.add_argument('--pull', type=str, help="Pull-up configuration (one of 'up', 'down', 'none'; default is 'up')")
-    args = parser.parse_args()
+    def cmd_gpio(args):
+        pina = args.ch_a[0]
+        pinb = args.ch_b[0]
+        pull = args.pull
 
-    print(args)
-    pina = args.ch_a[0]
-    pinb = args.ch_b[0]
-    pull = args.pull
+        if pull is None:
+            # Pull-ups enabled by default
+            pull = 'up'
 
-    if pull is None:
-        # Pull-ups enabled by default
-        pull = 'up'
+        if pull == 'up':
+            pull = pigpio.PUD_UP
+        elif pull == 'down':
+            pull = pigpio.PUD_DOWN
+        elif pull == 'none':
+            pull = pigpio.PUD_NONE
+        else:
+            print("invalid value for '--pull': %s (expected one of 'up', 'down', 'none')" % pull)
+            exit(1)
 
-    if pull == 'up':
-        pull = pigpio.PUD_UP
-    elif pull == 'down':
-        pull = pigpio.PUD_DOWN
-    elif pull == 'none':
-        pull = pigpio.PUD_NONE
-    else:
-        print("invalid value for '--pull': %s (expected one of 'up', 'down', 'none')" % pull)
-        exit(1)
+        pi = pigpio.pi()
+        enc = GPIOEncoder(pi, pina, pinb, pull)
 
-    pi = pigpio.pi()
-    enc = Encoder(pi, pina, pinb, pull)
+        try:
+            while True:
+                sys.stdout.write("Count: %d     \r" % enc.count)
+                time.sleep(0.05)
+        finally:
+            enc.stop()
+            pi.stop()
 
-    try:
+    def cmd_evdev(args):
+        dev = args.dev[0]
+
+        enc = EvdevEncoder(dev)
         while True:
-            sys.stdout.write("Count: %d     \r" % enc.count)
-            time.sleep(0.05)
-    finally:
-        enc.stop()
-        pi.stop()
+                sys.stdout.write("Count: %d     \r" % enc.count)
+                time.sleep(0.05)
+
+
+    parser = argparse.ArgumentParser(description='Read a rotary encoder')
+    subparsers = parser.add_subparsers(dest='subcommand')
+    subparsers.required = True
+
+    gpio = subparsers.add_parser('gpio')
+    gpio.set_defaults(func=cmd_gpio)
+    gpio.add_argument('ch_a', metavar='CH_A', type=int, nargs=1, help='Channel A GPIO (BCM numbering)')
+    gpio.add_argument('ch_b', metavar='CH_B', type=int, nargs=1, help='Channel B GPIO (BCM numbering)')
+    gpio.add_argument('--pull', type=str, help="Pull-up configuration (one of 'up', 'down', 'none'; default is 'up')")
+
+    evdev = subparsers.add_parser('evdev')
+    evdev.set_defaults(func=cmd_evdev)
+    evdev.add_argument('dev', metavar='DEV', type=str, nargs=1, help='Path to device file (eg. "/dev/input/event0")')
+
+    args = parser.parse_args()
+    print(args)
+    args.func(args)
