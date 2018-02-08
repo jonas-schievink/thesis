@@ -101,13 +101,19 @@ if __name__ == "__main__":
         print("{},{}".format(spd, tps))     # CSV output
 
 
+    eprint("")
+    print("Motor speed (-1..1),Encoder ticks per Second")
     try:
-        # FIXME: Better: range(-steps, steps)?
         for step in range(steps):
             measurestep(step)
+
+        motor.setspeed(0.0)
+        time.sleep(1.0)
+
         for step in range(0, -steps):
             measurestep(step)
         motor.setspeed(0)
     finally:
+        motor.setspeed(0)
         encoder.stop()
         pi.stop()
