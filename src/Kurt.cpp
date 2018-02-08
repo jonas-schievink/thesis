@@ -21,6 +21,10 @@ Kurt::Kurt(ros::NodeHandle& nh) : m_left(0.0), m_right(0.0)
     ros::NodeHandle paramHandle("~");
 
     paramHandle.param("dryrun", m_dryrun, false);
+    if (m_dryrun)
+    {
+        ROS_INFO("dryrun, motors will not be controlled");
+    }
 
     // Setup encoders/odometry
     std::string left_encoder_pattern;

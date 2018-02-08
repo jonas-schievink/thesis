@@ -3,7 +3,7 @@
     <param name="robot_description" command="$(find xacro)/xacro '$(find kurtberry_pi)/urdf/kurt_indoor.urdf.xacro'" />
     <node name="kurtberry_pi_node" pkg="kurtberry_pi" type="kurtberry_pi_node" output="screen" args="--debug">
         <!-- <param>s here (if needed) -->
-        <param name="dryrun" value="1" />
+        <param name="dryrun" value="true" />
     </node>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
 
