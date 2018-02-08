@@ -80,13 +80,23 @@ class GPIOEncoder:
 
 class EvdevEncoder:
     count = 0
-    wrap = 10000  # number of reported counts is mod this
+    _wrap = None  # number of reported counts is mod this
     _dev = None
     _thread = None
     _rawcount = None
 
     def __init__(self, dev):
         self._dev = InputDevice(dev)
+
+        events = self._dev.capabilities(absinfo=True)
+        if ecodes.EV_ABS not in events:
+            raise IOError("encoder device doesn't support EV_ABS events")
+        absinfo = events[ecodes.EV_ABS][0][1]
+        if absinfo.min != 0:
+            raise IOError("axis min value should be 0, is %d" % absinfo.min)
+
+        self._wrap = absinfo.max
+
         self._thread = Thread(target=EvdevEncoder.eventThread, args=(self,))
         self._thread.daemon = True
         self._thread.start()
@@ -104,9 +114,9 @@ class EvdevEncoder:
 
                 diff1 = current - last
                 if current > last:
-                    current -= self.wrap
+                    current -= self._wrap
                 else:
-                    last -= self.wrap
+                    last -= self._wrap
                 diff2 = current - last
                 if abs(diff1) < abs(diff2):
                     diff = diff1
