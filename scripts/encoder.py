@@ -114,6 +114,10 @@ class EvdevEncoder:
                     diff = diff2
                 self.count += diff
 
+    def stop(self):
+        # FIXME: Close the thread
+        pass
+
 
 if __name__ == "__main__":
     def cmd_gpio(args):
