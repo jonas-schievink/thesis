@@ -20,6 +20,8 @@ Kurt::Kurt(ros::NodeHandle& nh) : m_left(0.0), m_right(0.0)
 
     ros::NodeHandle paramHandle("~");
 
+    paramHandle.param("dryrun", m_dryrun, false);
+
     // Setup encoders/odometry
     std::string left_encoder_pattern;
     std::string right_encoder_pattern;
@@ -96,7 +98,7 @@ void Kurt::update()
     m_encRight->update();
     //m_odom->update();
 
-    if (false) // FIXME: Add --dryrun parameter/arg
+    if (!m_dryrun)
     {
         m_motLeft->set(m_left);
         m_motRight->set(m_right);

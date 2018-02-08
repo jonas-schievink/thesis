@@ -56,6 +56,8 @@ private:
      */
     double rightSpeed() const;
 
+    bool m_dryrun;
+
     std::unique_ptr<Encoder> m_encLeft;
     std::unique_ptr<Encoder> m_encRight;
     std::unique_ptr<Odometry> m_odom;
