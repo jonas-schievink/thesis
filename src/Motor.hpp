@@ -79,16 +79,18 @@ class Motor {
     float m_dirChangeDelay;
     /// @brief Time of the last update or construction.
     UpdateTime m_lastUpdate;
+    /// @brief Last change of direction (of @ref m_dir_pin).
+    UpdateTime m_lastDirChange;
     int m_pwmRange;
 
     /// @brief Set motor speed without safety checks.
-    void set_direct(float speed);
+    void setDirect(float speed);
 
     /**
      * @brief Attempt to set motor direction to @ref dir
      * @return `true` if successful, `false` if the limit was hit
      */
-    bool set_direction(bool dir);
+    bool setDirection(bool dir);
 
 public:
     Motor(MotorConfig config);

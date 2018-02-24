@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cmath>
+#include <cinttypes>
 #include <stdexcept>
 #include <string>
 
@@ -19,9 +20,9 @@ using std::chrono::high_resolution_clock;
 
 const static float DEFAULT_MAX_ACCEL = 0.3f;
 const static float DEFAULT_MAX_DIR_CHANGES = 1.0f;
-const static int DEFAULT_PWM_FREQ = 500; // Hz
+const static int DEFAULT_PWM_FREQ = 1000; // Hz
 const static int DEFAULT_PWM_RANGE = 1000;
-const static int DEFAULT_MAX_DELTA = 200; // ms
+const static int DEFAULT_MAX_DELTA = 100; // ms
 
 MotorConfig::MotorConfig(int ctrl_pin, int dir_pin) :
     ctrl_pin(ctrl_pin),
@@ -40,16 +41,14 @@ Motor::Motor(MotorConfig config) :
     m_actual(0.0f),
     m_dirChangeDelay(1.0f / config.max_dir_changes)
 {
-    m_lastUpdate = high_resolution_clock::now();
+    m_lastUpdate = m_lastDirChange = high_resolution_clock::now();
     m_speed_pin.setPwmFrequency(m_config.pwm_freq);
     m_pwmRange = m_speed_pin.setPwmRange(m_config.pwm_range);
-    ROS_INFO("requested freq = %d Hz, range = %d", m_config.pwm_freq, m_config.pwm_range);
-    ROS_INFO("actual pwm freq = %d Hz, range = %d",
-        m_speed_pin.pwmFrequency(),
-        m_pwmRange);
+    ROS_INFO("requested pwm freq = %d Hz, range = %d", m_config.pwm_freq, m_config.pwm_range);
+    ROS_INFO("actual    pwm freq = %d Hz, range = %d", m_speed_pin.pwmFrequency(), m_pwmRange);
 }
 
-void Motor::set_direct(float speed)
+void Motor::setDirect(float speed)
 {
     if (fabs(speed) > 0.001f) {
         bool backwards = speed < 0.0f;
@@ -72,7 +71,23 @@ void Motor::set(float speed)
 
 void Motor::update()
 {
-    set_direct(m_setpoint);
+    float diff = m_setpoint - m_actual;
+    Motor::UpdateTime now = high_resolution_clock::now();
+    int64_t delta_ms = duration_cast<milliseconds>(now - m_lastUpdate).count();
+    m_lastUpdate = now;
+
+    if (delta_ms > m_config.max_delta_ms)
+    {
+        ROS_WARN_STREAM_THROTTLE(1, "delay between Motor::update call too high! time delta = " << delta_ms << " ms");
+        delta_ms = m_config.max_delta_ms;
+    }
+
+    float delta = static_cast<float>(delta_ms) / 1000.0f;
+    // acceleration we'd like to apply during the last update period
+    float accel = diff / delta;
+
+    // FIXME: replace with actual ramp-up logic
+    setDirect(m_setpoint);
 }
 
 bool Motor::reachedSetPoint() const
