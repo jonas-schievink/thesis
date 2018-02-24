@@ -51,7 +51,7 @@ https://github.com/kenrestivo/linux/blob/b74f2674fd49a1d58baf5dbe5f0fbe052b65f87
                 gpios = <&gpio 21 0>, <&gpio 20 0>;
                 linux,axis = <0>;   // REL_X / ABS_X
                 rotary-encoder,rollover;
-                rotary-encoder,steps = <10000>;
+                rotary-encoder,steps = <100000>;
             };
 
             rot_right: rot_right {
@@ -61,7 +61,7 @@ https://github.com/kenrestivo/linux/blob/b74f2674fd49a1d58baf5dbe5f0fbe052b65f87
                 gpios = <&gpio 11 0>, <&gpio 10 0>;
                 linux,axis = <0>;   // REL_X / ABS_X
                 rotary-encoder,rollover;
-                rotary-encoder,steps = <10000>;
+                rotary-encoder,steps = <100000>;
             };
         };
     };
