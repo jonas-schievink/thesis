@@ -14,9 +14,6 @@ using std::cerr;
 using std::endl;
 using std::string;
 using std::signbit;
-using std::chrono::milliseconds;
-using std::chrono::duration_cast;
-using std::chrono::high_resolution_clock;
 
 const static float DEFAULT_MAX_ACCEL = 0.3f;
 const static float DEFAULT_MAX_DIR_CHANGES = 1.0f;
@@ -29,7 +26,9 @@ MotorConfig::MotorConfig(int ctrl_pin, int dir_pin) :
     direction_pin(dir_pin),
     pwm_freq(DEFAULT_PWM_FREQ),
     pwm_range(DEFAULT_PWM_RANGE),
-    max_delta_ms(DEFAULT_MAX_DELTA)
+    max_delta_ms(DEFAULT_MAX_DELTA),
+    max_accel(DEFAULT_MAX_ACCEL),
+    max_dir_changes(DEFAULT_MAX_DIR_CHANGES)
 {
 }
 
@@ -39,9 +38,17 @@ Motor::Motor(MotorConfig config) :
     m_config(config),
     m_setpoint(0.0f),
     m_actual(0.0f),
-    m_dirChangeDelay(1.0f / config.max_dir_changes)
+    m_dirChangeDelay(1.0f / config.max_dir_changes),
+    m_firstUpdate(true)
 {
-    m_lastUpdate = m_lastDirChange = high_resolution_clock::now();
+    ROS_INFO("configuring new Motor instance:");
+    ROS_INFO("  ctrl pin: %d", config.ctrl_pin);
+    ROS_INFO("  dir pin:  %d", config.direction_pin);
+    ROS_INFO("  max dir changes/s:  %f", config.max_dir_changes);
+    ROS_INFO("  = dir change delay: %f", m_dirChangeDelay);
+    ROS_INFO("  max delta time:     %ims", config.max_delta_ms);
+    ROS_INFO("  max acceleration:   %f", config.max_accel);
+
     m_speed_pin.setPwmFrequency(m_config.pwm_freq);
     m_pwmRange = m_speed_pin.setPwmRange(m_config.pwm_range);
     ROS_INFO("requested pwm freq = %d Hz, range = %d", m_config.pwm_freq, m_config.pwm_range);
@@ -55,6 +62,7 @@ void Motor::setDirect(float speed)
         m_dir_pin.digitalWrite(backwards);
     }
     m_speed_pin.pwm((unsigned int) (fabs(speed) * float(m_pwmRange)));
+    m_actual = speed;
 }
 
 void Motor::set(float speed)
@@ -71,23 +79,37 @@ void Motor::set(float speed)
 
 void Motor::update()
 {
+    if (m_firstUpdate)
+    {
+        // do nothing, just set the times to have a reference
+        m_lastUpdate = m_lastDirChange = ros::Time::now();
+        m_firstUpdate = false;
+        return;
+    }
+
     float diff = m_setpoint - m_actual;
-    Motor::UpdateTime now = high_resolution_clock::now();
-    int64_t delta_ms = duration_cast<milliseconds>(now - m_lastUpdate).count();
+    ros::Time now = ros::Time::now();
+    ros::Duration delta = now - m_lastUpdate;
     m_lastUpdate = now;
 
+    int64_t delta_ms = delta.toNSec() / 1000000;
     if (delta_ms > m_config.max_delta_ms)
     {
-        ROS_WARN_STREAM_THROTTLE(1, "delay between Motor::update call too high! time delta = " << delta_ms << " ms");
+        ROS_WARN_STREAM_THROTTLE(1, "delay between Motor::update calls too high! time delta = " << delta_ms << " ms");
         delta_ms = m_config.max_delta_ms;
     }
 
-    float delta = static_cast<float>(delta_ms) / 1000.0f;
-    // acceleration we'd like to apply during the last update period
-    float accel = diff / delta;
+    // acceleration we'd like to apply (might be negative)
+    float accel = diff / delta.toSec();
+    // clamp to maximum, keeping the sign
+    accel = copysign(std::min(std::abs(accel), m_config.max_accel), accel);
 
-    // FIXME: replace with actual ramp-up logic
-    setDirect(m_setpoint);
+    // TODO direction change limit
+
+    float speed = std::min(std::max(m_actual + accel, -1.0f), 1.0f);
+    m_actual = speed;
+    ROS_DEBUG("Motor::update(): setpoint=%-5.2f diff=%-5.2f delta=%-5.3fs accel=%-5.2f spd=%-5.2f", m_setpoint, diff, delta.toSec(), accel, m_actual);
+    //setDirect(speed);
 }
 
 bool Motor::reachedSetPoint() const

@@ -6,8 +6,8 @@
 #ifndef MOTOR_HPP
 #define MOTOR_HPP
 
+#include <ros/time.h>
 #include "PiGPIO.hpp"
-#include <chrono>
 
 /*
 
@@ -66,24 +66,29 @@ struct MotorConfig {
  * "dangerous" operations such as rapidly changing speed or direction.
  */
 class Motor {
-    typedef std::chrono::time_point<std::chrono::high_resolution_clock> UpdateTime;
-
     pigpio::Pin m_speed_pin;
     pigpio::Pin m_dir_pin;
     MotorConfig m_config;
-    /// @brief Target speed [-1.0, 1.0]
+    /// @brief Target speed, always in range [-1.0, 1.0]
     float m_setpoint;
-    /// @brief Actual speed [-1.0, 1.0]
+    /// @brief Actual speed, always in range [-1.0, 1.0]
     float m_actual;
     /// @brief Delay in seconds between direction changes.
     float m_dirChangeDelay;
     /// @brief Time of the last update or construction.
-    UpdateTime m_lastUpdate;
+    ros::Time m_lastUpdate;
     /// @brief Last change of direction (of @ref m_dir_pin).
-    UpdateTime m_lastDirChange;
+    ros::Time m_lastDirChange;
+    bool m_firstUpdate;
     int m_pwmRange;
 
-    /// @brief Set motor speed without safety checks.
+    /**
+     * @brief Set motor speed without safety checks.
+     * @param speed Motor speed in range -1...1
+     *
+     * This will set @ref m_actual to @ref speed and configure the GPIOs to
+     * drive the motor at the configured speed.
+     */
     void setDirect(float speed);
 
     /**
