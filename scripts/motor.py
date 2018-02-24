@@ -4,7 +4,7 @@ import curses
 import argparse
 import pigpio
 
-DEFAULT_PWM_FREQ = 100
+DEFAULT_PWM_FREQ = 1000
 DEFAULT_PWM_RANGE = 1024
 
 class Motor:
