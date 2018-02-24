@@ -106,9 +106,9 @@ void Motor::update()
 
     // TODO direction change limit
 
-    float speed = std::min(std::max(m_actual + accel, -1.0f), 1.0f);
+    float speed = std::min(std::max(m_actual + accel * static_cast<float>(delta.toSec()), -1.0f), 1.0f);
     m_actual = speed;
-    ROS_DEBUG("Motor::update(): setpoint=%-5.2f diff=%-5.2f delta=%-5.3fs accel=%-5.2f spd=%-5.2f", m_setpoint, diff, delta.toSec(), accel, m_actual);
+    ROS_DEBUG("Motor::update(): setpoint=%-5.2f diff=%-5.2f delta=%-5.3fs accel=%-5.2f spd=%-5.2f", m_setpoint, diff, delta.toSec(), accel, speed);
     //setDirect(speed);
 }
 
