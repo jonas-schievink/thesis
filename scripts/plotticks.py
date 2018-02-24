@@ -102,17 +102,15 @@ if __name__ == "__main__":
 
 
     eprint("")
-    print("Motor speed (-1..1),Encoder ticks per Second")
+    print("Motor speed (0..1),Encoder ticks per Second")
     try:
         for step in range(steps):
             measurestep(step)
 
-        motor.setspeed(0.0)
-        time.sleep(1.0)
-
-        for step in range(0, -steps):
-            measurestep(step)
-        motor.setspeed(0)
+        # ramp back down
+        for step in range(steps, 0):
+            motor.setspeed(step/steps)
+            time.sleep(0.05)
     finally:
         motor.setspeed(0)
         encoder.stop()
