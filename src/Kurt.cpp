@@ -6,10 +6,10 @@ using namespace hardware_interface;
 using std::unique_ptr;
 
 // Pin defaults, can be overridden via config
-#define PIN_L_CTRL 5
-#define PIN_L_DIR  6
-#define PIN_R_CTRL 22
-#define PIN_R_DIR  23
+#define PIN_L_CTRL 22
+#define PIN_L_DIR  23
+#define PIN_R_CTRL 5
+#define PIN_R_DIR  6
 
 Kurt::Kurt(ros::NodeHandle& nh) : m_left(0.0), m_right(0.0)
 {
