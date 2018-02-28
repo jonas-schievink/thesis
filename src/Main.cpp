@@ -12,12 +12,21 @@
 #include <thread>
 #include <chrono>
 #include <cstdio>
+#include <cstdlib>
 #include <signal.h>
 
+#include <pigpio.h>
 
 using std::cout;
 using std::endl;
 using std::unique_ptr;
+
+static void on_exit()
+{
+    // pigpio needs to be properly shut down or it might break everything until
+    // the Pi is rebooted.
+    gpioTerminate();
+}
 
 static void process_args(int argc, char** argv)
 {
@@ -34,25 +43,17 @@ static void process_args(int argc, char** argv)
     }
 }
 
-/**
- * @brief Restores the default SIGINT handler.
- *
- * Despite being told explicitly not to do so via
- * `ros::init_options::NoSigintHandler`, ROS will register a signal handler for
- * SIGINT upon node handle creation. That handler, however, doesn't work right
- * and requires pressing Ctrl+C twice.
- *
- * This function will override the ROS handler and restores the default
- * behaviour.
- */
-static void stop_hijacking_the_fucking_signal_handler()
-{
-    signal(SIGINT, SIG_DFL);
-}
-
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "kurtberry_pi_node", ros::init_options::NoSigintHandler);
+    // Both pigpio and ROS want to install signal handlers, so a little
+    // "initialization dance" is needed. We'll use ROS signal handlers, which
+    // will cause the main loop and program to exit. pigpio will then be shut
+    // down using an `atexit` handler and isn't allowed to catch signals.
+    gpioInitialise();
+    atexit(on_exit);
+
+    // ROS will overwrite pigpio's signal handlers
+    ros::init(argc, argv, "kurtberry_pi_node");
 
     process_args(argc, argv);
 
@@ -68,8 +69,6 @@ int main(int argc, char** argv)
         return 1;
     }
     controller_manager::ControllerManager cm(&*kurt, nh);
-
-    stop_hijacking_the_fucking_signal_handler();
 
     ros::Rate rate(1.0 / kurt->getPeriod().toSec());
     ros::AsyncSpinner spinner(1);
