@@ -17,8 +17,8 @@ using std::signbit;
 
 const static float DEFAULT_MAX_ACCEL = 0.3f;
 const static float DEFAULT_MAX_DIR_CHANGES = 1.0f;
-const static int DEFAULT_PWM_FREQ = 1000; // Hz
-const static int DEFAULT_PWM_RANGE = 1000;
+const static int DEFAULT_PWM_FREQ = 2000; // Hz
+const static int DEFAULT_PWM_RANGE = 100;
 const static int DEFAULT_MAX_DELTA = 100; // ms
 
 MotorConfig::MotorConfig(int ctrl_pin, int dir_pin) :
@@ -77,7 +77,7 @@ void Motor::set(float speed)
     m_setpoint = speed;
 }
 
-void Motor::update()
+void Motor::update(bool dryrun)
 {
     if (m_firstUpdate)
     {
@@ -109,7 +109,11 @@ void Motor::update()
     float speed = std::min(std::max(m_actual + accel * static_cast<float>(delta.toSec()), -1.0f), 1.0f);
     m_actual = speed;
     ROS_DEBUG("Motor::update(): setpoint=%-5.2f diff=%-5.2f delta=%-5.3fs accel=%-5.2f spd=%-5.2f", m_setpoint, diff, delta.toSec(), accel, speed);
-    //setDirect(speed);
+
+    if (!dryrun)
+    {
+        setDirect(speed);
+    }
 }
 
 bool Motor::reachedSetPoint() const

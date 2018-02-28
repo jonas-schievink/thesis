@@ -112,7 +112,7 @@ public:
     /**
      * @brief Must be called in regular intervals to update the motor speed
      */
-    void update();
+    void update(bool dryrun);
 
     /**
      * @brief Whether the motor has reached its set point.

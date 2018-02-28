@@ -36,7 +36,7 @@ Kurt::Kurt(ros::NodeHandle& nh) : m_left(0.0), m_right(0.0)
     paramHandle.param("right_encoder_pattern", right_encoder_pattern, std::string("rot_right"));
     paramHandle.param("left_encoder_invert", left_encoder_invert, true);
     paramHandle.param("right_encoder_invert", right_encoder_invert, false);
-    paramHandle.param("encoder_wraparound", encoder_wraparound, 10000);
+    paramHandle.param("encoder_wraparound", encoder_wraparound, 100000);
 
     int ticks_per_turn_of_wheel;
     paramHandle.param("ticks_per_turn_of_wheel", ticks_per_turn_of_wheel, 5000);
@@ -102,14 +102,11 @@ void Kurt::update()
     m_encRight->update();
     //m_odom->update();
 
-    if (!m_dryrun)
-    {
-        m_motLeft->set(m_left);
-        m_motRight->set(m_right);
-    }
+    m_motLeft->set(m_left);
+    m_motRight->set(m_right);
 
-    m_motLeft->update();
-    m_motRight->update();
+    m_motLeft->update(m_dryrun);
+    m_motRight->update(m_dryrun);
 
     ROS_DEBUG("L vel = %f rad/s, L cmd = %f rad/s, L effort = %f", leftSpeed(), cmd[0], m_left);
 }
