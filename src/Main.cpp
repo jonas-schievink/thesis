@@ -23,6 +23,17 @@ using std::unique_ptr;
 
 static void on_exit()
 {
+    static bool exited = false;   // `on_exit` called?
+
+    if (exited)
+    {
+        return;
+    }
+
+    exited = true;
+
+    cout << "on_exit(): shutting down pigpio" << endl;
+
     // pigpio needs to be properly shut down or it might break everything until
     // the Pi is rebooted.
     gpioTerminate();
@@ -75,7 +86,8 @@ int main(int argc, char** argv)
     spinner.start();
 
     ROS_INFO("kurtberry pi setup complete");
-    while (ros::ok())
+
+    while (!ros::isShuttingDown())
     {
         kurt->update();
         kurt->read();
@@ -83,6 +95,13 @@ int main(int argc, char** argv)
         kurt->write();
         rate.sleep();
     }
+
+    // Destructors of ROS objects wait *very long* until they return for some
+    // reason. Call our exit handler before that happens. Its effects only
+    // happen once.
+    on_exit();
+
+    while (ros::ok()) {}    // wait until shutdown is complete
 
     return 0;
 }
