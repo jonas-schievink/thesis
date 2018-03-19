@@ -1,9 +1,18 @@
 <?xml version="1.0"?>
 <launch>
+    <arg name="Kp" default="0.01" />
+    <arg name="Ki" default="0.0" />
+    <arg name="Kd" default="0.002" />
+    <arg name="windup_limit" default="1" />
+
     <param name="robot_description" command="$(find xacro)/xacro '$(find kurtberry_pi)/urdf/kurt_indoor.urdf.xacro'" />
     <node name="kurtberry_pi_node" pkg="kurtberry_pi" type="kurtberry_pi_node" output="screen" args="--debug">
-        <!-- <param>s here (if needed) -->
         <param name="dryrun" value="false" />
+
+        <param name="Kp" value="$(arg Kp)" />
+        <param name="Ki" value="$(arg Ki)" />
+        <param name="Kd" value="$(arg Kd)" />
+        <param name="windup_limit" value="$(arg windup_limit)" />
     </node>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
 
@@ -35,11 +44,6 @@
     <node name="cmd_vel_relay" pkg="topic_tools" type="relay" args="/cmd_vel /diffdrive/cmd_vel" />
     <!-- Same from /diffdrive/odom to /odom. -->
     <node name="odom_relay" pkg="topic_tools" type="relay" args="/diffdrive/odom /odom" />
-
-    <arg name="Kp" default="0.01" />
-    <arg name="Ki" default="0.0" />
-    <arg name="Kd" default="0.002" />
-    <arg name="windup_limit" default="1" />
 
     <node name="left_pid" pkg="pid" type="controller" ns="left_pid" output="screen">
         <param name="upper_limit" value="1.0" />
