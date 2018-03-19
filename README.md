@@ -12,27 +12,8 @@ Enthält Teile von [`kurt_driver`](https://github.com/uos/kurt_driver).
 ### LAN
 
 Der LAN-Port des Pis kann benutzt werden, um ihn an ein größeres ROS-Setup
-anzubinden. Ich habe ein sehr minimalistisches aber praktisches Netzwerksetup
-eingestellt: Der Pi erstellt sich nur eine Link-Local IPv4-Adresse. So ist kein
-manuelles Einstellen statischer IPs nötig, und einen DHCP-Server braucht man
-auch nicht.
-
-Natürlich wäre sehr unpraktisch, wenn man bei jedem Start die IP des Pis
-herausfinden müsste. Dafür gibt es auch eine Lösung: [mDNS][]. Der Hostname des
-Pis ist `kurtberry-pi`. Ist alles richtig eingestellt, sollte man den Pi als
-`kurtberry-pi.local` ansprechen können.
-
-Sollte das Setup nicht funktionieren, stelle sicher, dass Routing nach
-`169.254.0.0/16` funktioniert (IPv4-Block für Link-Lokale Adressen).
-
-Funktioniert das Anpingen der IP, aber nicht das Auflösen des Hostnamens, ist
-vermutlich eine fehlerhafte mDNS-Konfiguration schuld. Das wird normalerweise
-von Avahi oder systemd-networkd gemacht. Meines Wissens nach sollte das
-Standard-Setup von Ubuntu et al. aber ausreichen (evtl. hilft es, testweise das
-LAN-Interface im Network Manager auf "Link-Local only" zu stellen).
-
-TODO: Zusätzlich statische IP einrichten, damit Integration einfacher (welche
-IP, welches Netz?).
+anzubinden. Der Pi ist `192.168.100.1/24` und hat zusätzlich [mDNS][] um als
+`kurtberry-pi.local` erreichbar zu sein.
 
 [mDNS]: https://en.wikipedia.org/wiki/Multicast_DNS
 
@@ -67,6 +48,17 @@ Das ROS-Package wurde in den Catkin-Workspace `~/catkin_ws` gelinkt:
 
     ln -s ~/kurtberry-pi ~/catkin_ws/src/kurtberry_pi
 
-Ausführen:
+Zum Bauen:
 
-    rosrun kurtberry_pi kurtberry_pi_node
+    cd ~/catkin_ws
+    catkin b kurtberry_pi
+
+Eventuell muss die Job-Anzahl reduziert werden damit der RAM ausreicht:
+
+    catkin b kurtberry_pi -j 1
+
+Zum Ausführen (aufgrund des GPIO-Zugriffs werden Root-Rechte benötigt, daher
+öffne ich hierfür meistens ein zusätzliches Root-Terminal):
+
+    sudo -s
+    roslaunch kurtberry_pi kurt.launch
