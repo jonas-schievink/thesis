@@ -26,12 +26,15 @@ public:
     ros::Duration getPeriod() const;
 
     /**
-     * @brief Updates encoder counters.
+     * @brief Updates encoders and motor controllers.
      */
     void update();
 
     /**
-     * @brief Reads the current command and writes it to the motors.
+     * @brief Reads the current command and writes it to the controllers.
+     *
+     * This will not immediately change motor speed. Call @ref update to run the
+     * controllers.
      */
     void read();
 
