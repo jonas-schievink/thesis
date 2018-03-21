@@ -23,7 +23,7 @@ float PIController::update(float actual, float delta)
     m_integral = std::min(m_integralLimit, m_integral);
     m_integral = std::max(-m_integralLimit, m_integral);
 
-    float effort = (error * m_kp) * (m_integral * m_ki);
+    float effort = (error * m_kp) + (m_integral * m_ki);
     m_effort += effort;
 
     // clamp
