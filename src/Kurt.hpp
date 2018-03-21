@@ -4,6 +4,7 @@
 #include "Encoder.hpp"
 #include "Odometry.hpp"
 #include "Motor.hpp"
+#include "PIController.hpp"
 
 #include <hardware_interface/robot_hw.h>
 #include <hardware_interface/joint_command_interface.h>
@@ -32,16 +33,12 @@ public:
     /**
      * @brief Reads the current command and writes it to the motors.
      */
-    void read() const;
+    void read();
 
     /**
      * @brief Writes the current encoder counts to the joint state.
      */
     void write();
-
-    // Receives the control effort from the PID controllers.
-    void leftCtrl(const std_msgs::Float64& msg);
-    void rightCtrl(const std_msgs::Float64& msg);
 
 private:
     /**
@@ -63,15 +60,9 @@ private:
     std::unique_ptr<Odometry> m_odom;
     std::unique_ptr<Motor> m_motLeft;
     std::unique_ptr<Motor> m_motRight;
-    double m_left;
-    double m_right;
 
-    ros::Publisher m_leftSetpoint;
-    ros::Publisher m_rightSetpoint;
-    ros::Publisher m_leftState;
-    ros::Publisher m_rightState;
-    ros::Subscriber m_leftEffort;
-    ros::Subscriber m_rightEffort;
+    PIController m_leftController;
+    PIController m_rightController;
 
     hardware_interface::JointStateInterface m_jointState;
     hardware_interface::VelocityJointInterface m_jointCtrl;

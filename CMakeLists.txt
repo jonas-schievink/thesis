@@ -147,6 +147,7 @@ add_executable(${PROJECT_NAME}_node
     src/EvdevEncoder.cpp
     src/Motor.cpp
     src/PiGPIO.cpp
+    src/PIController.cpp
     src/Utils.cpp
     src/Odometry.cpp
     src/Encoder.cpp

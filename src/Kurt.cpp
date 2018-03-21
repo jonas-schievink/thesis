@@ -11,7 +11,7 @@ using std::unique_ptr;
 #define PIN_R_CTRL 5
 #define PIN_R_DIR  6
 
-Kurt::Kurt(ros::NodeHandle& nh) : m_left(0.0), m_right(0.0)
+Kurt::Kurt(ros::NodeHandle& nh)
 {
     cmd[0] = cmd[1] = 0.0;
     pos[0] = pos[1] = 0.0;
@@ -70,13 +70,15 @@ Kurt::Kurt(ros::NodeHandle& nh) : m_left(0.0), m_right(0.0)
     MotorConfig rightCfg(right_ctrl, right_dir);
     m_motRight = unique_ptr<Motor>(new Motor(rightCfg));
 
-    // Connect to PID topics
-    m_leftSetpoint = nh.advertise<std_msgs::Float64>("/left_pid/setpoint", 1);
-    m_rightSetpoint = nh.advertise<std_msgs::Float64>("/right_pid/setpoint", 1);
-    m_leftState = nh.advertise<std_msgs::Float64>("/left_pid/state", 1);
-    m_rightState = nh.advertise<std_msgs::Float64>("/right_pid/state", 1);
-    m_leftEffort = nh.subscribe("/left_pid/control_effort", 1, &Kurt::leftCtrl, this);
-    m_rightEffort = nh.subscribe("/right_pid/control_effort", 1, &Kurt::rightCtrl, this);
+    // configure speed controllers
+    float kp;
+    float ki;
+    float windupLimit;
+    paramHandle.param("Kp", kp, 0.05f);
+    paramHandle.param("Ki", ki, 0.05f);
+    paramHandle.param("windup_limit", windupLimit, 1.5f);
+    m_leftController = PIController(kp, ki, windupLimit);
+    m_rightController = PIController(kp, ki, windupLimit);
 
     // Register the joint state interface.
     // It will report the current joint state as read from the encoders to ROS.
@@ -102,30 +104,22 @@ void Kurt::update()
     m_encRight->update();
     //m_odom->update();
 
-    m_motLeft->set(m_left);
-    m_motRight->set(m_right);
+    float leftEffort = m_leftController.update(leftSpeed(), getPeriod().toSec());
+    float rightEffort = m_rightController.update(rightSpeed(), getPeriod().toSec());
+    m_motLeft->set(leftEffort);
+    m_motRight->set(rightEffort);
 
     m_motLeft->update(m_dryrun);
     m_motRight->update(m_dryrun);
 
-    ROS_DEBUG("L vel = %f rad/s, L cmd = %f rad/s, L effort = %f", leftSpeed(), cmd[0], m_left);
+    ROS_DEBUG("L vel = %f rad/s, L cmd = %f rad/s, L effort = %f", leftSpeed(), cmd[0], leftEffort);
 }
 
-void Kurt::read() const
+void Kurt::read()
 {
-    // apply cmd[0]/cmd[1] to motor controllers
-    std_msgs::Float64 setpoint;
-    setpoint.data = cmd[0];
-    m_leftSetpoint.publish(setpoint);
-    setpoint.data = cmd[1];
-    m_rightSetpoint.publish(setpoint);
-
-    // also send state in radians / second so the controller can do work
-    std_msgs::Float64 state;
-    state.data = leftSpeed();
-    m_leftState.publish(state);
-    state.data = rightSpeed();
-    m_rightState.publish(state);
+    // read motor commands from ROS and apply them
+    m_leftController.setSetpoint(cmd[0]);
+    m_rightController.setSetpoint(cmd[1]);
 }
 
 void Kurt::write()
@@ -135,16 +129,6 @@ void Kurt::write()
     pos[1] = m_encRight->totalRadians();
     vel[0] = leftSpeed();
     vel[1] = rightSpeed();
-}
-
-void Kurt::leftCtrl(const std_msgs::Float64& msg)
-{
-    m_left = msg.data;
-}
-
-void Kurt::rightCtrl(const std_msgs::Float64& msg)
-{
-    m_right = msg.data;
 }
 
 double Kurt::leftSpeed() const
