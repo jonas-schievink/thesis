@@ -15,7 +15,7 @@ using std::endl;
 using std::string;
 using std::signbit;
 
-const static float DEFAULT_MAX_ACCEL = 0.3f;
+const static float DEFAULT_MAX_ACCEL = 0.1f;
 const static float DEFAULT_MAX_DIR_CHANGES = 1.0f;
 const static int DEFAULT_PWM_FREQ = 2000; // Hz
 const static int DEFAULT_PWM_RANGE = 100;
