@@ -1,24 +1,25 @@
-#ifndef PI_HPP
-#define PI_HPP
+#ifndef PIDCONTROLLER_HPP
+#define PIDCONTROLLER_HPP
 
 const float MAX_EFFORT = 1.0f;
 const float MIN_EFFORT = -1.0f;
 
 /**
- * @brief PI controller implementation.
+ * @brief PID controller implementation.
  */
-class PIController {
+class PIDController {
     float m_setpoint;   // target
     float m_effort;     // last control effort returned by `update`
     float m_integral;   // cumulative error
-    float m_kp, m_ki;
+    float m_lastError;  // last error, for derivative calculation
+    float m_kp, m_ki, m_kd;
     float m_integralLimit;  // integral windup limit
 
 public:
     /**
      * @brief Create a new parameterized controller.
      */
-    PIController(float kp, float ki, float integralLimit);
+    PIDController(float kp, float ki, float kd, float integralLimit);
 
     /**
      * @brief Create a useless dummy controller.
@@ -26,7 +27,7 @@ public:
      * This is needed to allow default construction before we can get the
      * parameters from ROS, because C++.
      */
-    PIController();
+    PIDController();
 
     /**
      * @brief Sets the setpoint of the controller (the target value).

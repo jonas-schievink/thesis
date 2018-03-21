@@ -4,7 +4,7 @@
 #include "Encoder.hpp"
 #include "Odometry.hpp"
 #include "Motor.hpp"
-#include "PIController.hpp"
+#include "PIDController.hpp"
 
 #include <hardware_interface/robot_hw.h>
 #include <hardware_interface/joint_command_interface.h>
@@ -64,8 +64,8 @@ private:
     std::unique_ptr<Motor> m_motLeft;
     std::unique_ptr<Motor> m_motRight;
 
-    PIController m_leftController;
-    PIController m_rightController;
+    PIDController m_leftController;
+    PIDController m_rightController;
 
     hardware_interface::JointStateInterface m_jointState;
     hardware_interface::VelocityJointInterface m_jointCtrl;

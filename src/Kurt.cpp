@@ -73,12 +73,14 @@ Kurt::Kurt(ros::NodeHandle& nh)
     // configure speed controllers
     float kp;
     float ki;
+    float kd;
     float windupLimit;
     paramHandle.param("Kp", kp, 0.05f);
     paramHandle.param("Ki", ki, 0.05f);
+    paramHandle.param("Kd", kd, 0.05f);
     paramHandle.param("windup_limit", windupLimit, 1.5f);
-    m_leftController = PIController(kp, ki, windupLimit);
-    m_rightController = PIController(kp, ki, windupLimit);
+    m_leftController = PIDController(kp, ki, kd, windupLimit);
+    m_rightController = PIDController(kp, ki, kd, windupLimit);
 
     // Register the joint state interface.
     // It will report the current joint state as read from the encoders to ROS.
