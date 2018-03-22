@@ -8,16 +8,157 @@
 
     <param name="robot_description" command="$(find xacro)/xacro '$(find kurtberry_pi)/urdf/kurt_indoor.urdf.xacro'" />
     <node name="kurtberry_pi_node" pkg="kurtberry_pi" type="kurtberry_pi_node" output="screen" args="--debug">
-        <!-- Controller parameters are mandatory -->
+        <!--
+            Note: Commented-out <param>s use the default value indicated in
+            their `value` attribute.
+        -->
+
+        <!--====================================
+            Motor PID parameters (mandatory)
+        =====================================-->
+
         <param name="Kp" value="$(arg Kp)" />
         <param name="Ki" value="$(arg Ki)" />
         <param name="Kd" value="$(arg Kd)" />
         <param name="windup_limit" value="$(arg windup_limit)" />
 
+        <!--===============================================
+            Motor hardware and protection configuration
+        ================================================-->
+
+        <!--
+            `left_ctrl_gpio` / `left_dir_gpio` / `right_ctrl_gpio` / `right_dir_gpio`
+
+            Configures which Pi GPIOs are attached to the motor drivers.
+        -->
+        <!-- <param name="left_ctrl_gpio" value="22"> -->
+        <!-- <param name="left_dir_gpio" value="23"> -->
+        <!-- <param name="right_ctrl_gpio" value="5"> -->
+        <!-- <param name="right_dir_gpio" value="6"> -->
+
+        <!--
+            `pwm_freq` / `pwm_range`
+
+            PWM frequency and range to request from pigpio. Since the Pi only
+            has a single hardware PWM output, pigpio uses DMA-based software
+            PWM. This imposes a somewhat strict limit on frequency and range,
+            meaning that there's now a tradeoff between both.
+
+            If the range is too high, it will be lowered automatically. Refer to
+            the console output to see the actual range.
+
+            Note that the default configuration is already close to optimal:
+            Lowering the frequency by much will cause current surges that are
+            too large to be buffered by the installed capacitors. This causes
+            the supply voltage to dip, which in turn pulls down the 5V rail,
+            causing the Pi to reset.
+
+            Sadly, a frequency of 2 kHz only leaves a resolution of 100 values.
+            However, that seems to be enough for the motors to run at most
+            speeds smoothly.
+        -->
+        <!-- <param name="pwm_freq" value="2000"> -->
+        <!-- <param name="pwm_range" value="100"> -->
+
+        <!--
+            `max_delta_ms`
+
+            Maximum control loop iteration delta for the `Motor.cpp` controller.
+            A large delay between updates can cause large jumps in the motor
+            speed, which we want to avoid to reduce stress and current surges.
+
+            This parameter limits the maximum time used to calculate the new
+            speed, even if the real time is larger. The effect is a reduced
+            acceleration.
+
+            This is only used if the control loop is too slow. It normally runs
+            at 20 Hz or more.
+        -->
+        <!-- <param name="max_delta_ms" value="100"> -->
+
+        <!--
+            `max_accel`
+
+            Maximum change in raw motor speed per second. The speed is between
+            -1.0 and 1.0, where -1.0 is maximum backwards speed and 1.0 is
+            maximum forwards speed.
+        -->
+        <!-- <param name="max_accel" value="0.1"> -->
+
+        <!--
+            `max_dir_changes`
+
+            Maximum number of motor direction changes per second.
+
+            The motor drivers don't have integrated dead-time, so every
+            direction change effectively causes a very brief short circuit. This
+            limit protects the drivers from getting too hot due to many
+            direction changes.
+        -->
+        <!-- <param name="max_dir_changes" value="1.0"> -->
+
+        <!--
+            `deadzone`
+
+            Clamp speed values with a magnitude `<= deadzone` to zero. Helps
+            eliminate coil whining when motors are stationary but driven with a
+            low duty cycle (the PID controller won't correct this).
+        -->
+        <param name="deadzone" value="0.02" />
+
+
+        <!--=========================
+            Encoder configuration
+        ==========================-->
+
+        <!--
+            `left_encoder_pattern` / `right_encoder_pattern`
+
+            Substring of the encoder device name (in evdev) used to find the
+            encoder. Must be unambiguous and match the name in the device tree.
+        -->
+        <!-- <param name="left_encoder_pattern" value="rot_left" /> -->
+        <!-- <param name="right_encoder_pattern" value="rot_right" /> -->
+
+        <!--
+            `left_encoder_invert` / `right_encoder_invert`
+
+            Invert direction of left/right encoder.
+        -->
+        <!-- <param name="left_encoder_invert" value="true" /> -->
+        <!-- <param name="right_encoder_invert" value="false" /> -->
+
+        <!--
+            `encoder_wraparound`
+
+            Number of encoder ticks after which the reported counter wraps to 0.
+            Must be in-sync with the `steps` value in the device tree.
+        -->
+        <!-- <param name="encoder_wraparound" value="100000" /> -->
+
+        <!--
+            `ticks_per_turn_of_wheel`
+
+            Encoder ticks reported per completed wheel rotation. Used to
+            calculate odometry. Could use some tuning to get better accuracy.
+        -->
+        <!-- <param name="ticks_per_turn_of_wheel" value="5000" /> -->
+
+
+        <!--=====================
+            Debugging options
+        ======================-->
+
+        <!--
+            `dryrun`
+
+            Don't control motors, but run the rest of the controller stack.
+        -->
         <param name="dryrun" value="false" />
 
-        <!-- TODO: Document all params -->
+        <!-- TODO: Turn -debug into a param -->
     </node>
+
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
 
     <rosparam>
