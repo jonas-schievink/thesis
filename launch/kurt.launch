@@ -2,18 +2,21 @@
 <launch>
     <!-- Kp: oscillation starts at roughly 0.0025 (forwards only) -->
     <arg name="Kp" default="0.00125" />
-    <arg name="Ki" default="0.0002" />
+    <arg name="Ki" default="0.0" />
     <arg name="Kd" default="0.0001" />
     <arg name="windup_limit" default="1" />
 
     <param name="robot_description" command="$(find xacro)/xacro '$(find kurtberry_pi)/urdf/kurt_indoor.urdf.xacro'" />
     <node name="kurtberry_pi_node" pkg="kurtberry_pi" type="kurtberry_pi_node" output="screen" args="--debug">
-        <param name="dryrun" value="false" />
-
+        <!-- Controller parameters are mandatory -->
         <param name="Kp" value="$(arg Kp)" />
         <param name="Ki" value="$(arg Ki)" />
         <param name="Kd" value="$(arg Kd)" />
         <param name="windup_limit" value="$(arg windup_limit)" />
+
+        <param name="dryrun" value="false" />
+
+        <!-- TODO: Document all params -->
     </node>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
 

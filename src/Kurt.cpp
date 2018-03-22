@@ -11,6 +11,9 @@ using std::unique_ptr;
 #define PIN_R_CTRL 5
 #define PIN_R_DIR  6
 
+ConfigException::ConfigException(const char* msg)
+    : runtime_error(msg) {}
+
 Kurt::Kurt(ros::NodeHandle& nh)
 {
     cmd[0] = cmd[1] = 0.0;
@@ -66,19 +69,36 @@ Kurt::Kurt(ros::NodeHandle& nh)
     paramHandle.param("right_dir_gpio", right_dir, PIN_R_DIR);
 
     MotorConfig leftCfg(left_ctrl, left_dir);
+    paramHandle.getParam("pwm_freq", leftCfg.pwm_freq);
+    paramHandle.getParam("pwm_range", leftCfg.pwm_range);
+    paramHandle.getParam("max_delta_ms", leftCfg.max_delta_ms);
+    paramHandle.getParam("max_accel", leftCfg.max_accel);
+    paramHandle.getParam("max_dir_changes", leftCfg.max_dir_changes);
     m_motLeft = unique_ptr<Motor>(new Motor(leftCfg));
+
     MotorConfig rightCfg(right_ctrl, right_dir);
+    paramHandle.getParam("pwm_freq", rightCfg.pwm_freq);
+    paramHandle.getParam("pwm_range", rightCfg.pwm_range);
+    paramHandle.getParam("max_delta_ms", rightCfg.max_delta_ms);
+    paramHandle.getParam("max_accel", rightCfg.max_accel);
+    paramHandle.getParam("max_dir_changes", rightCfg.max_dir_changes);
     m_motRight = unique_ptr<Motor>(new Motor(rightCfg));
 
-    // configure speed controllers
+    // Configure speed controllers
     float kp;
     float ki;
     float kd;
     float windupLimit;
-    paramHandle.param("Kp", kp, 0.05f);
-    paramHandle.param("Ki", ki, 0.05f);
-    paramHandle.param("Kd", kd, 0.05f);
-    paramHandle.param("windup_limit", windupLimit, 1.5f);
+    bool pidParamsPresent = true;
+    pidParamsPresent &= paramHandle.getParam("Kp", kp);
+    pidParamsPresent &= paramHandle.getParam("Ki", ki);
+    pidParamsPresent &= paramHandle.getParam("Kd", kd);
+    pidParamsPresent &= paramHandle.getParam("windup_limit", windupLimit);
+    if (!pidParamsPresent)
+    {
+        throw ConfigException("Missing node parameters! The `Kp`, `Ki`, `Kd` and `windup_limit` parameters are required.");
+    }
+
     m_leftController = PIDController(kp, ki, kd, windupLimit);
     m_rightController = PIDController(kp, ki, kd, windupLimit);
 

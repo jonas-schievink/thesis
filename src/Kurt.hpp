@@ -14,6 +14,10 @@
 
 #include <memory>
 
+class ConfigException : public std::runtime_error {
+public:
+    ConfigException(const char* msg);
+};
 
 class Kurt : public hardware_interface::RobotHW
 {
