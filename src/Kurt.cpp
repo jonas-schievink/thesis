@@ -14,14 +14,12 @@ using std::unique_ptr;
 ConfigException::ConfigException(const char* msg)
     : runtime_error(msg) {}
 
-Kurt::Kurt(ros::NodeHandle& nh)
+Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& paramHandle)
 {
     cmd[0] = cmd[1] = 0.0;
     pos[0] = pos[1] = 0.0;
     vel[0] = vel[1] = 0.0;
     eff[0] = eff[1] = 0.0;
-
-    ros::NodeHandle paramHandle("~");
 
     paramHandle.param("dryrun", m_dryrun, false);
     if (m_dryrun)

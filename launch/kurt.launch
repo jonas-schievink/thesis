@@ -7,7 +7,7 @@
     <arg name="windup_limit" default="1" />
 
     <param name="robot_description" command="$(find xacro)/xacro '$(find kurtberry_pi)/urdf/kurt_indoor.urdf.xacro'" />
-    <node name="kurtberry_pi_node" pkg="kurtberry_pi" type="kurtberry_pi_node" output="screen" args="--debug">
+    <node name="kurtberry_pi_node" pkg="kurtberry_pi" type="kurtberry_pi_node" output="screen">
         <!--
             Note: Commented-out <param>s use the default value indicated in
             their `value` attribute.
@@ -156,7 +156,13 @@
         -->
         <param name="dryrun" value="false" />
 
-        <!-- TODO: Turn -debug into a param -->
+        <!--
+            `debug`
+
+            Output `ROS_DEBUG` messages to the console. This is a lot of
+            continuous output and should only be enabled during development.
+        -->
+        <param name="debug" value="true" /> <!-- Default: false -->
     </node>
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />

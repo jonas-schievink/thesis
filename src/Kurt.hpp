@@ -22,7 +22,10 @@ public:
 class Kurt : public hardware_interface::RobotHW
 {
 public:
-    Kurt(ros::NodeHandle& nh);
+    /**
+     * @brief Creates a new Kurt instance and loads parameters from ROS.
+     */
+    Kurt(ros::NodeHandle& nh, ros::NodeHandle& paramHandle);
 
     Kurt(const Kurt& other) = delete;
     Kurt& operator=(const Kurt& other) = delete;

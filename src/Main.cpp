@@ -18,6 +18,7 @@
 #include <pigpio.h>
 
 using std::cout;
+using std::cerr;
 using std::endl;
 using std::unique_ptr;
 
@@ -41,16 +42,12 @@ static void on_exit()
 
 static void process_args(int argc, char** argv)
 {
-    for (int i = 1; i < argc; i++)
+    if (argc > 1)
     {
-        std::string arg = argv[i];
-
-        if (arg == "--debug")
-        {
-            if(ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug)) {
-                ros::console::notifyLoggerLevelsChanged();
-            }
-        }
+        cerr << "Invalid command line argument: " << argv[1] << endl;
+        cerr << "This node is configured exclusively via ROS node parameters." << endl;
+        cerr << "Refer to the default launch file for configuration options." << endl;
+        exit(1);
     }
 }
 
@@ -69,10 +66,21 @@ int main(int argc, char** argv)
     process_args(argc, argv);
 
     ros::NodeHandle nh;
+    ros::NodeHandle paramHandle("~");
+
+    if (paramHandle.param("debug", false))
+    {
+        // display ROS_DEBUG output (this spams a lot of controller updates!)
+        if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
+        {
+            ros::console::notifyLoggerLevelsChanged();
+        }
+    }
+
     unique_ptr<Kurt> kurt;
     try
     {
-        kurt = unique_ptr<Kurt>(new Kurt(nh));
+        kurt = unique_ptr<Kurt>(new Kurt(nh, paramHandle));
     }
     catch (const EvdevException& ex)
     {
