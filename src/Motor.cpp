@@ -20,6 +20,7 @@ const static float DEFAULT_MAX_DIR_CHANGES = 1.0f;
 const static int DEFAULT_PWM_FREQ = 2000; // Hz
 const static int DEFAULT_PWM_RANGE = 100;
 const static int DEFAULT_MAX_DELTA = 100; // ms
+const static int DEFAULT_DEADZONE = 0.0f;
 
 MotorConfig::MotorConfig(int ctrl_pin, int dir_pin) :
     ctrl_pin(ctrl_pin),
@@ -28,7 +29,8 @@ MotorConfig::MotorConfig(int ctrl_pin, int dir_pin) :
     pwm_range(DEFAULT_PWM_RANGE),
     max_delta_ms(DEFAULT_MAX_DELTA),
     max_accel(DEFAULT_MAX_ACCEL),
-    max_dir_changes(DEFAULT_MAX_DIR_CHANGES)
+    max_dir_changes(DEFAULT_MAX_DIR_CHANGES),
+    deadzone(DEFAULT_DEADZONE)
 {
 }
 
@@ -48,6 +50,7 @@ Motor::Motor(MotorConfig config) :
     ROS_INFO("  = dir change delay: %f", m_dirChangeDelay);
     ROS_INFO("  max delta time:     %ims", config.max_delta_ms);
     ROS_INFO("  max acceleration:   %f", config.max_accel);
+    ROS_INFO("  deadzone:           %f", config.deadzone);
 
     m_speed_pin.setPwmFrequency(m_config.pwm_freq);
     m_pwmRange = m_speed_pin.setPwmRange(m_config.pwm_range);
@@ -57,11 +60,26 @@ Motor::Motor(MotorConfig config) :
 
 void Motor::setDirect(float speed)
 {
-    if (fabs(speed) > 0.001f) {
+    if (fabs(speed) > 0.001f)
+    {
+        // Only update direction when speed is large-ish. Prevent needless
+        // direction changes when speed oscillates around 0.
         bool backwards = speed < 0.0f;
         m_dir_pin.digitalWrite(backwards);
     }
-    m_speed_pin.pwm((unsigned int) (fabs(speed) * float(m_pwmRange)));
+
+    unsigned int duty;
+    if (fabs(speed) <= m_config.deadzone)
+    {
+        // Inside deadzone -> Clamp to zero
+        duty = 0;
+    }
+    else
+    {
+        duty = (unsigned int) (fabs(speed) * float(m_pwmRange));
+    }
+
+    m_speed_pin.pwm(duty);
     m_actual = speed;
 }
 

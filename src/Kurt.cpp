@@ -74,14 +74,12 @@ Kurt::Kurt(ros::NodeHandle& nh)
     paramHandle.getParam("max_delta_ms", leftCfg.max_delta_ms);
     paramHandle.getParam("max_accel", leftCfg.max_accel);
     paramHandle.getParam("max_dir_changes", leftCfg.max_dir_changes);
+    paramHandle.getParam("deadzone", leftCfg.deadzone);
     m_motLeft = unique_ptr<Motor>(new Motor(leftCfg));
 
-    MotorConfig rightCfg(right_ctrl, right_dir);
-    paramHandle.getParam("pwm_freq", rightCfg.pwm_freq);
-    paramHandle.getParam("pwm_range", rightCfg.pwm_range);
-    paramHandle.getParam("max_delta_ms", rightCfg.max_delta_ms);
-    paramHandle.getParam("max_accel", rightCfg.max_accel);
-    paramHandle.getParam("max_dir_changes", rightCfg.max_dir_changes);
+    MotorConfig rightCfg(leftCfg);
+    rightCfg.ctrl_pin = right_ctrl;
+    rightCfg.direction_pin = right_dir;
     m_motRight = unique_ptr<Motor>(new Motor(rightCfg));
 
     // Configure speed controllers

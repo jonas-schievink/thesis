@@ -55,6 +55,13 @@ struct MotorConfig {
      * @brief Max. number of direction changes per second.
      */
     float max_dir_changes;
+    /**
+     * @brief Speed values of up to this magnitude are clamped to 0.
+     *
+     * This is useful to get rid of the coil whining when the motors aren't
+     * actually turning because the speed value is too low.
+     */
+    float deadzone;
 
     MotorConfig(int ctrl_pin, int dir_pin);
 };
@@ -62,8 +69,9 @@ struct MotorConfig {
 /**
  * @brief Controls speed and direction of a single motor using GPIOs.
  *
- * This class does *not* perform PID speed control, but it will prevent
- * "dangerous" operations such as rapidly changing speed or direction.
+ * This class does *not* perform PID speed control, it represents an additional
+ * layer of protection which prevents overly rapid acceleration and other
+ * stressful operations for the robot hardware.
  */
 class Motor {
     pigpio::Pin m_speed_pin;
