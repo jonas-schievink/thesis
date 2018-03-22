@@ -42,7 +42,7 @@ static struct libevdev* matchDevice(
 
     if (name.find(search_name) != std::string::npos)
     {
-        ROS_DEBUG("matched evdev %s with name %s against pattern %s", dev_path.c_str(), name.c_str(), search_name.c_str());
+        ROS_INFO("matched evdev %s with name %s against pattern %s", dev_path.c_str(), name.c_str(), search_name.c_str());
         return dev;
     }
 
