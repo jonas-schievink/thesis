@@ -128,15 +128,16 @@ void Kurt::update()
     m_encRight->update();
     //m_odom->update();
 
-    float leftEffort = m_leftController.update(leftSpeed(), getPeriod().toSec());
-    float rightEffort = m_rightController.update(rightSpeed(), getPeriod().toSec());
-    m_motLeft->set(leftEffort);
-    m_motRight->set(rightEffort);
+    float leftSpd = m_leftController.update(leftSpeed(), getPeriod().toSec());
+    float rightSpd = m_rightController.update(rightSpeed(), getPeriod().toSec());
+    m_motLeft->set(leftSpd);
+    m_motRight->set(rightSpd);
 
     m_motLeft->update(m_dryrun);
     m_motRight->update(m_dryrun);
 
-    ROS_DEBUG("L vel = %f rad/s, L cmd = %f rad/s, L effort = %f", leftSpeed(), cmd[0], leftEffort);
+    ROS_DEBUG("L vel = %f rad/s, L cmd = %f rad/s, L spd = %f", leftSpeed(), cmd[0], leftSpd);
+    ROS_DEBUG("R vel = %f rad/s, R cmd = %f rad/s, R spd = %f", rightSpeed(), cmd[1], rightSpd);
 }
 
 void Kurt::read()
