@@ -62,6 +62,10 @@ struct MotorConfig {
      * actually turning because the speed value is too low.
      */
     float deadzone;
+    /**
+     * @brief Invert the motor direction.
+     */
+    bool invert;
 
     MotorConfig(int ctrl_pin, int dir_pin);
 };

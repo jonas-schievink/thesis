@@ -59,12 +59,16 @@ Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& paramHandle)
     // Set up motors
     int left_ctrl;
     int left_dir;
+    bool left_invert;
     int right_ctrl;
     int right_dir;
+    bool right_invert;
     paramHandle.param("left_ctrl_gpio", left_ctrl, PIN_L_CTRL);
     paramHandle.param("left_dir_gpio", left_dir, PIN_L_DIR);
     paramHandle.param("right_ctrl_gpio", right_ctrl, PIN_R_CTRL);
     paramHandle.param("right_dir_gpio", right_dir, PIN_R_DIR);
+    paramHandle.param("left_invert", left_invert, false);
+    paramHandle.param("right_invert", right_invert, false);
 
     MotorConfig leftCfg(left_ctrl, left_dir);
     paramHandle.getParam("pwm_freq", leftCfg.pwm_freq);
@@ -73,11 +77,13 @@ Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& paramHandle)
     paramHandle.getParam("max_accel", leftCfg.max_accel);
     paramHandle.getParam("max_dir_changes", leftCfg.max_dir_changes);
     paramHandle.getParam("deadzone", leftCfg.deadzone);
+    leftCfg.invert = left_invert;
     m_motLeft = unique_ptr<Motor>(new Motor(leftCfg));
 
     MotorConfig rightCfg(leftCfg);
     rightCfg.ctrl_pin = right_ctrl;
     rightCfg.direction_pin = right_dir;
+    rightCfg.invert = right_invert;
     m_motRight = unique_ptr<Motor>(new Motor(rightCfg));
 
     // Configure speed controllers

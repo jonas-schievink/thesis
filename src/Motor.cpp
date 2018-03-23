@@ -30,7 +30,8 @@ MotorConfig::MotorConfig(int ctrl_pin, int dir_pin) :
     max_delta_ms(DEFAULT_MAX_DELTA),
     max_accel(DEFAULT_MAX_ACCEL),
     max_dir_changes(DEFAULT_MAX_DIR_CHANGES),
-    deadzone(DEFAULT_DEADZONE)
+    deadzone(DEFAULT_DEADZONE),
+    invert(false)
 {
 }
 
@@ -65,7 +66,7 @@ void Motor::setDirect(float speed)
         // Only update direction when speed is large-ish. Prevent needless
         // direction changes when speed oscillates around 0.
         bool backwards = speed < 0.0f;
-        m_dir_pin.digitalWrite(backwards);
+        m_dir_pin.digitalWrite(backwards ^ m_config.invert);
     }
 
     unsigned int duty;

@@ -37,6 +37,14 @@
         <!-- <param name="right_dir_gpio" value="6"> -->
 
         <!--
+            `left_invert` / `right_invert`
+
+            Invert direction of left/right motor.
+        -->
+        <param name="left_invert" value="true" />
+        <param name="right_invert" value="false" />
+
+        <!--
             `pwm_freq` / `pwm_range`
 
             PWM frequency and range to request from pigpio. Since the Pi only
