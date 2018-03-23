@@ -116,7 +116,7 @@ Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& paramHandle)
     // Register joint control interface.
     JointHandle ctrl_left(m_jointState.getHandle("left_middle_wheel_joint"), &cmd[0]);
     m_jointCtrl.registerHandle(ctrl_left);
-    JointHandle ctrl_right(m_jointState.getHandle("right_middle_wheel_joint"), &cmd[0]);
+    JointHandle ctrl_right(m_jointState.getHandle("right_middle_wheel_joint"), &cmd[1]);
     m_jointCtrl.registerHandle(ctrl_right);
 
     registerInterface(&m_jointCtrl);
