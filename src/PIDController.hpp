@@ -38,7 +38,7 @@ public:
      * @brief Updates the PID controller state and returns the control effort.
      * @param actual Actual system state (wheel speed).
      * @param delta Time since the last call to `update`.
-     * @return Control effort to apply to the actuators (-1...1).
+     * @return Actuator output (-1...1).
      *
      * This should be called in regular intervals.
      */
