@@ -31,10 +31,10 @@
 
             Configures which Pi GPIOs are attached to the motor drivers.
         -->
-        <!-- <param name="left_ctrl_gpio" value="22"> -->
-        <!-- <param name="left_dir_gpio" value="23"> -->
-        <!-- <param name="right_ctrl_gpio" value="5"> -->
-        <!-- <param name="right_dir_gpio" value="6"> -->
+        <!-- <param name="left_ctrl_gpio" value="22" /> -->
+        <!-- <param name="left_dir_gpio" value="23" /> -->
+        <!-- <param name="right_ctrl_gpio" value="5" /> -->
+        <!-- <param name="right_dir_gpio" value="6" /> -->
 
         <!--
             `left_invert` / `right_invert`
@@ -65,8 +65,8 @@
             However, that seems to be enough for the motors to run at most
             speeds smoothly.
         -->
-        <!-- <param name="pwm_freq" value="2000"> -->
-        <!-- <param name="pwm_range" value="100"> -->
+        <!-- <param name="pwm_freq" value="2000" /> -->
+        <!-- <param name="pwm_range" value="100" /> -->
 
         <!--
             `max_delta_ms`
@@ -82,7 +82,7 @@
             This is only used if the control loop is too slow. It normally runs
             at 20 Hz or more.
         -->
-        <!-- <param name="max_delta_ms" value="100"> -->
+        <!-- <param name="max_delta_ms" value="100" /> -->
 
         <!--
             `max_accel`
@@ -92,7 +92,7 @@
             maximum forwards speed. This means an acceleration value of 0.1
             should take about 10 seconds to reach max. speed.
         -->
-        <param name="max_accel" value="0.05">
+        <param name="max_accel" value="0.05" />
 
         <!--
             `max_dir_changes`
@@ -104,7 +104,7 @@
             limit protects the drivers from getting too hot due to many
             direction changes.
         -->
-        <!-- <param name="max_dir_changes" value="1.0"> -->
+        <!-- <param name="max_dir_changes" value="1.0" /> -->
 
         <!--
             `deadzone`
@@ -163,7 +163,7 @@
 
             Don't control motors, but run the rest of the controller stack.
         -->
-        <param name="dryrun" value="false" />
+        <param name="dryrun" value="true" />
 
         <!--
             `debug`
@@ -171,7 +171,7 @@
             Output `ROS_DEBUG` messages to the console. This is a lot of
             continuous output and should only be enabled during development.
         -->
-        <param name="debug" value="true" /> <!-- Default: false -->
+        <param name="debug" value="false" /> <!-- Default: false -->
     </node>
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
