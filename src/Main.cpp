@@ -95,7 +95,7 @@ int main(int argc, char** argv)
 
     controller_manager::ControllerManager cm(&*kurt, nh);
 
-    ros::Rate rate(1.0 / kurt->getPeriod().toSec());
+    ros::Rate rate(kurt->getFreq());
     ros::AsyncSpinner spinner(1);
     spinner.start();
 
@@ -107,7 +107,16 @@ int main(int argc, char** argv)
         kurt->read();
         cm.update(ros::Time::now(), kurt->getPeriod());
         kurt->write();
-        rate.sleep();
+
+        if (!rate.sleep())
+        {
+            // The code assumes that `update` is called in regular fixed
+            // intervals. If we can't keep this promise, it's an error since all
+            // timing gets slightly messed up.
+            // Decrease `getFreq` to properly fix this.
+            float actualHz = 1.0 / rate.cycleTime().toSec();
+            ROS_ERROR_THROTTLE(1, "can't keep up with requested update rate of %d Hz! actual rate: %f Hz", kurt->getFreq(), actualHz);
+        }
     }
 
     // Destructors of ROS objects wait *very long* until they return for some

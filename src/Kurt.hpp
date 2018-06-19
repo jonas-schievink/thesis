@@ -14,11 +14,20 @@
 
 #include <memory>
 
+/**
+ * @brief Exception thrown when node parameters are invalid.
+ */
 class ConfigException : public std::runtime_error {
 public:
     ConfigException(const char* msg);
 };
 
+/**
+ * @brief Main robot class
+ *
+ * Creates and owns robot components (Motors, Controllers, Encoders) and
+ * integrates them into ROS.
+ */
 class Kurt : public hardware_interface::RobotHW
 {
 public:
@@ -30,10 +39,22 @@ public:
     Kurt(const Kurt& other) = delete;
     Kurt& operator=(const Kurt& other) = delete;
 
+    /**
+     * @brief Gets the main loop frequency at which @ref update must be called.
+     * @see getPeriod
+     */
+    int getFreq() const;
+
+    /**
+     * @brief Gets the time between successive calls to @ref update.
+     * @see getFreq
+     */
     ros::Duration getPeriod() const;
 
     /**
      * @brief Updates encoders and motor controllers.
+     *
+     * This must be called at a fixed frequency given by @ref getFreq.
      */
     void update();
 

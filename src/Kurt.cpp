@@ -166,7 +166,12 @@ double Kurt::rightSpeed() const
     return m_encRight->radians() / getPeriod().toSec();
 }
 
+int Kurt::getFreq() const
+{
+    return 100;
+}
+
 ros::Duration Kurt::getPeriod() const
 {
-    return ros::Duration(0.05);
+    return ros::Duration(1.0f / (float) getFreq());
 }
