@@ -89,9 +89,10 @@
 
             Maximum change in raw motor speed per second. The speed is between
             -1.0 and 1.0, where -1.0 is maximum backwards speed and 1.0 is
-            maximum forwards speed.
+            maximum forwards speed. This means an acceleration value of 0.1
+            should take about 10 seconds to reach max. speed.
         -->
-        <!-- <param name="max_accel" value="0.1"> -->
+        <param name="max_accel" value="0.05">
 
         <!--
             `max_dir_changes`
