@@ -40,6 +40,7 @@ public:
      */
     Kurt(ros::NodeHandle& nh, ros::NodeHandle& paramHandle);
 
+    // ROS keeps pointers to members, so moving and copying is a big no-no
     Kurt(const Kurt& other) = delete;
     Kurt& operator=(const Kurt& other) = delete;
 

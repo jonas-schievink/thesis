@@ -40,26 +40,30 @@
         <param name="right_invert" value="false" />
 
         <!--
-            `pwm_freq` / `pwm_range`
+            `pwm_sample_rate` / `pwm_freq` / `pwm_range`
 
-            PWM frequency and range to request from pigpio. Since the Pi only
-            has a single hardware PWM output, pigpio uses DMA-based software
-            PWM. This imposes a somewhat strict limit on frequency and range,
-            meaning that there's now a tradeoff between both.
+            PWM sample rate (in microseconds between samples), frequency (in
+            Hertz) and range to request from pigpio.
+
+            Refer to the pigpio docs for information on: sample_rate:
+            http://abyz.me.uk/rpi/pigpio/cif.html#gpioCfgClock freq:
+            http://abyz.me.uk/rpi/pigpio/cif.html#gpioSetPWMfrequency range:
+            http://abyz.me.uk/rpi/pigpio/cif.html#gpioSetPWMrange
+
+            Since the Pi only has a single hardware PWM output, pigpio uses
+            DMA-based software PWM. This imposes a somewhat strict limit on
+            frequency and range, meaning that there's now a tradeoff between
+            both.
 
             If the range is too high, it will be lowered automatically. Refer to
             the console output to see the actual range.
 
-            Note that the default configuration is already close to optimal:
-            Lowering the frequency by much will cause current surges that are
-            too large to be buffered by the installed capacitors. This causes
-            the supply voltage to dip, which in turn pulls down the 5V rail,
-            causing the Pi to reset.
-
-            Sadly, a frequency of 2 kHz only leaves a resolution of 100 values.
-            However, that seems to be enough for the motors to run at most
-            speeds smoothly.
+            Do not set a frequency below 2 kHz. This will cause current surges
+            that are too large to be buffered by the installed capacitors. This
+            causes the supply voltage to dip, which in turn pulls down the 5V
+            rail, causing the Pi to reset or crash.
         -->
+        <param name="pwm_sample_rate" value="5" />
         <param name="pwm_freq" value="2000" />
         <param name="pwm_range" value="100" />
 
