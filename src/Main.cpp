@@ -89,9 +89,9 @@ int main(int argc, char** argv)
         ROS_ERROR("couldn't open encoder device: %s", ex.what());
         return 1;
     }
-    catch (const ConfigException& ex)
+    catch (const MissingNodeParam& ex)
     {
-        ROS_ERROR("exiting due to configuration error: %s", ex.what());
+        ROS_ERROR("%s", ex.what());
         return 1;
     }
 

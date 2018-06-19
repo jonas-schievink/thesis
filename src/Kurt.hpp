@@ -15,11 +15,15 @@
 #include <memory>
 
 /**
- * @brief Exception thrown when node parameters are invalid.
+ * @brief Exception thrown when a required node parameter is missing.
  */
-class ConfigException : public std::runtime_error {
+class MissingNodeParam : public std::exception {
+    std::string m_what;
+
 public:
-    ConfigException(const char* msg);
+    MissingNodeParam(const char* name);
+
+    const char* what() const noexcept;
 };
 
 /**

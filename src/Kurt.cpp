@@ -5,27 +5,38 @@
 using namespace hardware_interface;
 using std::unique_ptr;
 
-// Pin defaults, can be overridden via config
-#define PIN_L_CTRL 22
-#define PIN_L_DIR  23
-#define PIN_R_CTRL 5
-#define PIN_R_DIR  6
+MissingNodeParam::MissingNodeParam(const char* name)
+    : exception()
+{
+    m_what.append("required node parameter was not defined: ");
+    m_what.append(name);
+}
 
-ConfigException::ConfigException(const char* msg)
-    : runtime_error(msg) {}
+const char* MissingNodeParam::what() const noexcept
+{
+    return m_what.c_str();
+}
 
-Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& paramHandle)
+/**
+ * @brief Load a node parameter and throw a @ref MissingNodeParam when unset
+ */
+template<typename T>
+static void param(ros::NodeHandle& p, const char* name, T& variable)
+{
+    if (!p.getParam(name, variable))
+    {
+        throw MissingNodeParam(name);
+    }
+}
+
+Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& p)
 {
     cmd[0] = cmd[1] = 0.0;
     pos[0] = pos[1] = 0.0;
     vel[0] = vel[1] = 0.0;
     eff[0] = eff[1] = 0.0;
 
-    paramHandle.param("dryrun", m_dryrun, false);
-    if (m_dryrun)
-    {
-        ROS_INFO("dryrun, motors will not be controlled");
-    }
+    param(p, "dryrun", m_dryrun);
 
     // Setup encoders/odometry
     std::string left_encoder_pattern;
@@ -33,14 +44,14 @@ Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& paramHandle)
     bool left_encoder_invert;
     bool right_encoder_invert;
     int encoder_wraparound;
-    paramHandle.param("left_encoder_pattern", left_encoder_pattern, std::string("rot_left"));
-    paramHandle.param("right_encoder_pattern", right_encoder_pattern, std::string("rot_right"));
-    paramHandle.param("left_encoder_invert", left_encoder_invert, true);
-    paramHandle.param("right_encoder_invert", right_encoder_invert, false);
-    paramHandle.param("encoder_wraparound", encoder_wraparound, 100000);
+    param(p, "left_encoder_pattern", left_encoder_pattern);
+    param(p, "right_encoder_pattern", right_encoder_pattern);
+    param(p, "left_encoder_invert", left_encoder_invert);
+    param(p, "right_encoder_invert", right_encoder_invert);
+    param(p, "encoder_wraparound", encoder_wraparound);
 
     int ticks_per_turn_of_wheel;
-    paramHandle.param("ticks_per_turn_of_wheel", ticks_per_turn_of_wheel, 5000);
+    param(p, "ticks_per_turn_of_wheel", ticks_per_turn_of_wheel);
 
     m_encLeft = unique_ptr<Encoder>(new EvdevEncoder(
         ticks_per_turn_of_wheel,
@@ -63,20 +74,20 @@ Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& paramHandle)
     int right_ctrl;
     int right_dir;
     bool right_invert;
-    paramHandle.param("left_ctrl_gpio", left_ctrl, PIN_L_CTRL);
-    paramHandle.param("left_dir_gpio", left_dir, PIN_L_DIR);
-    paramHandle.param("right_ctrl_gpio", right_ctrl, PIN_R_CTRL);
-    paramHandle.param("right_dir_gpio", right_dir, PIN_R_DIR);
-    paramHandle.param("left_invert", left_invert, false);
-    paramHandle.param("right_invert", right_invert, false);
+    param(p, "left_ctrl_gpio", left_ctrl);
+    param(p, "left_dir_gpio", left_dir);
+    param(p, "right_ctrl_gpio", right_ctrl);
+    param(p, "right_dir_gpio", right_dir);
+    param(p, "left_invert", left_invert);
+    param(p, "right_invert", right_invert);
 
     MotorConfig leftCfg(left_ctrl, left_dir);
-    paramHandle.getParam("pwm_freq", leftCfg.pwm_freq);
-    paramHandle.getParam("pwm_range", leftCfg.pwm_range);
-    paramHandle.getParam("max_delta_ms", leftCfg.max_delta_ms);
-    paramHandle.getParam("max_accel", leftCfg.max_accel);
-    paramHandle.getParam("max_dir_changes", leftCfg.max_dir_changes);
-    paramHandle.getParam("deadzone", leftCfg.deadzone);
+    param(p, "pwm_freq", leftCfg.pwm_freq);
+    param(p, "pwm_range", leftCfg.pwm_range);
+    param(p, "max_accel", leftCfg.max_accel);
+    param(p, "max_delta_ms", leftCfg.max_delta_ms);
+    param(p, "max_dir_changes", leftCfg.max_dir_changes);
+    param(p, "deadzone", leftCfg.deadzone);
     leftCfg.invert = left_invert;
     m_motLeft = unique_ptr<Motor>(new Motor(leftCfg));
 
@@ -91,15 +102,10 @@ Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& paramHandle)
     float ki;
     float kd;
     float windupLimit;
-    bool pidParamsPresent = true;
-    pidParamsPresent &= paramHandle.getParam("Kp", kp);
-    pidParamsPresent &= paramHandle.getParam("Ki", ki);
-    pidParamsPresent &= paramHandle.getParam("Kd", kd);
-    pidParamsPresent &= paramHandle.getParam("windup_limit", windupLimit);
-    if (!pidParamsPresent)
-    {
-        throw ConfigException("Missing node parameters! The `Kp`, `Ki`, `Kd` and `windup_limit` parameters are required.");
-    }
+    param(p, "Kp", kp);
+    param(p, "Ki", ki);
+    param(p, "Kd", kd);
+    param(p, "windup_limit", windupLimit);
 
     m_leftController = PIDController(kp, ki, kd, windupLimit);
     m_rightController = PIDController(kp, ki, kd, windupLimit);
@@ -120,6 +126,11 @@ Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& paramHandle)
     m_jointCtrl.registerHandle(ctrl_right);
 
     registerInterface(&m_jointCtrl);
+
+    if (m_dryrun)
+    {
+        ROS_INFO("dryrun, motors will not be controlled");
+    }
 }
 
 void Kurt::update()

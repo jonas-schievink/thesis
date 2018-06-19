@@ -8,11 +8,6 @@
 
     <param name="robot_description" command="$(find xacro)/xacro '$(find kurtberry_pi)/urdf/kurt_indoor.urdf.xacro'" />
     <node name="kurtberry_pi_node" pkg="kurtberry_pi" type="kurtberry_pi_node" output="screen">
-        <!--
-            Note: Commented-out <param>s use the default value indicated in
-            their `value` attribute.
-        -->
-
         <!--====================================
             Motor PID parameters (mandatory)
         =====================================-->
@@ -31,10 +26,10 @@
 
             Configures which Pi GPIOs are attached to the motor drivers.
         -->
-        <!-- <param name="left_ctrl_gpio" value="22" /> -->
-        <!-- <param name="left_dir_gpio" value="23" /> -->
-        <!-- <param name="right_ctrl_gpio" value="5" /> -->
-        <!-- <param name="right_dir_gpio" value="6" /> -->
+        <param name="left_ctrl_gpio" value="22" />
+        <param name="left_dir_gpio" value="23" />
+        <param name="right_ctrl_gpio" value="5" />
+        <param name="right_dir_gpio" value="6" />
 
         <!--
             `left_invert` / `right_invert`
@@ -65,8 +60,8 @@
             However, that seems to be enough for the motors to run at most
             speeds smoothly.
         -->
-        <!-- <param name="pwm_freq" value="2000" /> -->
-        <!-- <param name="pwm_range" value="100" /> -->
+        <param name="pwm_freq" value="2000" />
+        <param name="pwm_range" value="100" />
 
         <!--
             `max_delta_ms`
@@ -82,7 +77,7 @@
             This is only used if the control loop is too slow. It normally runs
             at 20 Hz or more.
         -->
-        <!-- <param name="max_delta_ms" value="100" /> -->
+        <param name="max_delta_ms" value="50" />
 
         <!--
             `max_accel`
@@ -104,7 +99,7 @@
             limit protects the drivers from getting too hot due to many
             direction changes.
         -->
-        <!-- <param name="max_dir_changes" value="1.0" /> -->
+        <param name="max_dir_changes" value="1.0" />
 
         <!--
             `deadzone`
@@ -126,16 +121,16 @@
             Substring of the encoder device name (in evdev) used to find the
             encoder. Must be unambiguous and match the name in the device tree.
         -->
-        <!-- <param name="left_encoder_pattern" value="rot_left" /> -->
-        <!-- <param name="right_encoder_pattern" value="rot_right" /> -->
+        <param name="left_encoder_pattern" value="rot_left" />
+        <param name="right_encoder_pattern" value="rot_right" />
 
         <!--
             `left_encoder_invert` / `right_encoder_invert`
 
             Invert direction of left/right encoder.
         -->
-        <!-- <param name="left_encoder_invert" value="true" /> -->
-        <!-- <param name="right_encoder_invert" value="false" /> -->
+        <param name="left_encoder_invert" value="true" />
+        <param name="right_encoder_invert" value="false" />
 
         <!--
             `encoder_wraparound`
@@ -143,7 +138,7 @@
             Number of encoder ticks after which the reported counter wraps to 0.
             Must be in-sync with the `steps` value in the device tree.
         -->
-        <!-- <param name="encoder_wraparound" value="100000" /> -->
+        <param name="encoder_wraparound" value="100000" />
 
         <!--
             `ticks_per_turn_of_wheel`
@@ -151,7 +146,7 @@
             Encoder ticks reported per completed wheel rotation. Used to
             calculate odometry. Could use some tuning to get better accuracy.
         -->
-        <!-- <param name="ticks_per_turn_of_wheel" value="5000" /> -->
+        <param name="ticks_per_turn_of_wheel" value="5000" />
 
 
         <!--=====================
