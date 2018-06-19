@@ -149,14 +149,30 @@
         <param name="ticks_per_turn_of_wheel" value="5000" />
 
 
-        <!--=====================
-            Debugging options
-        ======================-->
+        <!--=================================
+            Debugging and general options
+        ==================================-->
+
+        <!--
+            `update_rate_hz`
+
+            Main loop update rate in Hz.
+
+            Increasing this will increase accuracy/reactivity of the controller
+            and CPU load, so this is a tradeoff. If the CPU can't keep up with
+            the configured value, errors will be logged since this messed up all
+            timing.
+
+            100 Hz should be more than enough for most applications.
+        -->
+        <param name="update_rate_hz" value="100" />
 
         <!--
             `dryrun`
 
-            Don't control motors, but run the rest of the controller stack.
+            Don't drive the motors, but run the rest of the controller stack.
+            This is useful for testing something while preventing that the robot
+            moves.
         -->
         <param name="dryrun" value="true" />
 

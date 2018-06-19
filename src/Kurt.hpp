@@ -89,6 +89,7 @@ private:
     double rightSpeed() const;
 
     bool m_dryrun;
+    int m_updateRate;
 
     std::unique_ptr<Encoder> m_encLeft;
     std::unique_ptr<Encoder> m_encRight;

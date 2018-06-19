@@ -37,6 +37,7 @@ Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& p)
     eff[0] = eff[1] = 0.0;
 
     param(p, "dryrun", m_dryrun);
+    param(p, "update_rate_hz", m_updateRate);
 
     // Setup encoders/odometry
     std::string left_encoder_pattern;
@@ -179,7 +180,7 @@ double Kurt::rightSpeed() const
 
 int Kurt::getFreq() const
 {
-    return 100;
+    return m_updateRate;
 }
 
 ros::Duration Kurt::getPeriod() const
