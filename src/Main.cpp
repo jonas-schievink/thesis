@@ -68,7 +68,9 @@ int main(int argc, char** argv)
     ros::NodeHandle nh;
     ros::NodeHandle paramHandle("~");
 
-    if (paramHandle.param("debug", false))
+    bool debug = paramHandle.param("debug", false);
+
+    if (debug)
     {
         // display ROS_DEBUG output (this spams a lot of controller updates!)
         if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
@@ -114,8 +116,10 @@ int main(int argc, char** argv)
             // intervals. If we can't keep this promise, it's an error since all
             // timing gets slightly messed up.
             // Decrease `getFreq` to properly fix this.
+
+            const char* note = debug ? " (this is expected in debug mode - set debug param to false and this should go away)" : "";
             float actualHz = 1.0 / rate.cycleTime().toSec();
-            ROS_ERROR_THROTTLE(1, "can't keep up with requested update rate of %d Hz! actual rate: %f Hz", kurt->getFreq(), actualHz);
+            ROS_ERROR_THROTTLE(1, "can't keep up with requested update rate of %d Hz! actual rate: %f Hz%s", kurt->getFreq(), actualHz, note);
         }
     }
 
