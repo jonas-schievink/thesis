@@ -9,13 +9,6 @@
 #include <ros/time.h>
 #include "PiGPIO.hpp"
 
-/*
-
-Future work:
-- Braking (should be possible by setting speed to 0 and reversing direction)
-- "Actual" speed integration (wheel m/s instead of 0% - 100%)
-
-*/
 
 struct MotorConfig {
     /**
