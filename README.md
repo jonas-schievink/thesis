@@ -1,7 +1,5 @@
 # ROS-Package `kurtberry_pi`
 
-Enthält Teile von [`kurt_driver`](https://github.com/uos/kurt_driver).
-
 ## Ordnerstruktur
 
 * `kernel`: Den Linux-Kernel betreffende Dateien (Device Tree Overlays, Treiber, etc.)
@@ -62,3 +60,9 @@ Zum Ausführen (aufgrund des GPIO-Zugriffs werden Root-Rechte benötigt, daher
 
     sudo -s
     roslaunch kurtberry_pi kurt.launch
+
+## Copyright
+
+Enthält Teile von [`kurt_driver`](https://github.com/uos/kurt_driver).
+
+`kurt_driver` © Jochen Sprickerhof
