@@ -2,8 +2,13 @@
 
 ## Ordnerstruktur
 
-* `kernel`: Den Linux-Kernel betreffende Dateien (Device Tree Overlays, Treiber, etc.)
-* `scripts`: Diverse Python-Scripts zum Testen
+* `cmake`: `FindX.cmake`-Skripte zum Auffinden benötigter Bibliotheken.
+* `kernel`: Den Linux-Kernel betreffende Dateien (Device Tree Overlays, Treiber, etc.).
+* `launch`: Enthält Launch-Files zum Starten und Konfigurieren des gesamten Projekts.
+* `meshes`: Enthält 3D-Meshes zur Visualisierung mit [rviz](http://wiki.ros.org/rviz) oder [Gazebo](http://gazebosim.org/) (kopiert von [`kurt_driver`](https://github.com/uos/kurt_driver)).
+* `scripts`: Diverse Python-Scripts zum Testen der Hardware und Plotten des Systemverhaltens.
+* `src`: Eigentlicher Code des ROS-Nodes, der auf dem Raspberry Pi läuft.
+* `urdf`: Roboterbeschreibungsdateien (größtenteils kopiert von [`kurt_driver`](https://github.com/uos/kurt_driver)).
 
 ## Über das Setup
 
