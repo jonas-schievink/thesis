@@ -18,7 +18,7 @@ const char* MissingNodeParam::what() const noexcept
 }
 
 /**
- * @brief Load a node parameter and throw a @ref MissingNodeParam when unset
+ * @brief Load a node parameter and throw a @ref MissingNodeParam when missing.
  */
 template<typename T>
 static void param(ros::NodeHandle& p, const char* name, T& variable)
@@ -29,17 +29,13 @@ static void param(ros::NodeHandle& p, const char* name, T& variable)
     }
 }
 
-Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& p)
+Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& p) :
+    m_cmd{0}, m_pos{0}, m_vel{0}, m_eff{0}
 {
-    cmd[0] = cmd[1] = 0.0;
-    pos[0] = pos[1] = 0.0;
-    vel[0] = vel[1] = 0.0;
-    eff[0] = eff[1] = 0.0;
-
     param(p, "dryrun", m_dryrun);
     param(p, "update_rate_hz", m_updateRate);
 
-    // Setup encoders/odometry
+    // Setup encoders
     std::string left_encoder_pattern;
     std::string right_encoder_pattern;
     bool left_encoder_invert;
@@ -66,7 +62,6 @@ Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& p)
         encoder_wraparound,
         right_encoder_invert
     ));
-    m_odom = unique_ptr<Odometry>(new Odometry(nh, *m_encLeft, *m_encRight, 1.0f));
 
     // Set up motors
     int left_ctrl;
@@ -113,17 +108,24 @@ Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& p)
 
     // Register the joint state interface.
     // It will report the current joint state as read from the encoders to ROS.
-    JointStateHandle state_left("left_middle_wheel_joint", &pos[0], &vel[0], &eff[0]);
-    m_jointState.registerHandle(state_left);
-    JointStateHandle state_right("right_middle_wheel_joint", &pos[1], &vel[1], &eff[1]);
-    m_jointState.registerHandle(state_right);
+    const char* joint_names[6] = {
+        "left_front_wheel_joint", "left_middle_wheel_joint", "left_back_wheel_joint",
+        "right_front_wheel_joint", "right_middle_wheel_joint", "right_back_wheel_joint",
+    };
+    for (int i = 0; i < 6; i++)
+    {
+        JointStateHandle state(joint_names[i], &m_pos[i], &m_vel[i], &m_eff[i]);
+        m_jointState.registerHandle(state);
+    }
 
     registerInterface(&m_jointState);
 
     // Register joint control interface.
-    JointHandle ctrl_left(m_jointState.getHandle("left_middle_wheel_joint"), &cmd[0]);
+    // ros_control will write the requested angular velocities of the joints
+    // there.
+    JointHandle ctrl_left(m_jointState.getHandle("left_middle_wheel_joint"), &m_cmd[0]);
     m_jointCtrl.registerHandle(ctrl_left);
-    JointHandle ctrl_right(m_jointState.getHandle("right_middle_wheel_joint"), &cmd[1]);
+    JointHandle ctrl_right(m_jointState.getHandle("right_middle_wheel_joint"), &m_cmd[1]);
     m_jointCtrl.registerHandle(ctrl_right);
 
     registerInterface(&m_jointCtrl);
@@ -138,7 +140,6 @@ void Kurt::update()
 {
     m_encLeft->update();
     m_encRight->update();
-    //m_odom->update();
 
     float leftSpd = m_leftController.update(leftSpeed(), getPeriod().toSec());
     float rightSpd = m_rightController.update(rightSpeed(), getPeriod().toSec());
@@ -148,24 +149,24 @@ void Kurt::update()
     m_motLeft->update(m_dryrun);
     m_motRight->update(m_dryrun);
 
-    ROS_DEBUG("L vel = %f rad/s, L cmd = %f rad/s, L spd = %f", leftSpeed(), cmd[0], leftSpd);
-    ROS_DEBUG("R vel = %f rad/s, R cmd = %f rad/s, R spd = %f", rightSpeed(), cmd[1], rightSpd);
+    ROS_DEBUG("L vel = %f rad/s, L cmd = %f rad/s, L spd = %f", leftSpeed(), m_cmd[0], leftSpd);
+    ROS_DEBUG("R vel = %f rad/s, R cmd = %f rad/s, R spd = %f", rightSpeed(), m_cmd[1], rightSpd);
 }
 
 void Kurt::read()
 {
     // read motor commands from ROS and apply them
-    m_leftController.setSetpoint(cmd[0]);
-    m_rightController.setSetpoint(cmd[1]);
+    m_leftController.setSetpoint(m_cmd[0]);
+    m_rightController.setSetpoint(m_cmd[1]);
 }
 
 void Kurt::write()
 {
     // write wheel rotations to vars
-    pos[0] = m_encLeft->totalRadians();
-    pos[1] = m_encRight->totalRadians();
-    vel[0] = leftSpeed();
-    vel[1] = rightSpeed();
+    m_pos[0] = m_pos[1] = m_pos[2] = m_encLeft->totalRadians();
+    m_pos[3] = m_pos[4] = m_pos[5] = m_encRight->totalRadians();
+    m_vel[0] = m_vel[1] = m_vel[2] = leftSpeed();
+    m_vel[3] = m_vel[4] = m_vel[5] = rightSpeed();
 }
 
 double Kurt::leftSpeed() const

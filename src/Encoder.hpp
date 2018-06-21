@@ -9,13 +9,10 @@
  * Subclasses only need to implement `read` and call the constructor.
  */
 class Encoder {
+    /** @brief Encoder ticks per wheel revolution */
     int m_ticksPerTurn;
-    /// @brief Ground distance the robot moves per encoder tick (approx.).
-    double m_groundDistPerTick;
 
     double m_revolutions;
-    double m_groundDist;
-    double m_speed;
     double m_radians;
     double m_totalRadians;
     /// @brief Time of the last update
@@ -25,7 +22,6 @@ protected:
     /**
      * @brief Creates a new encoder instance
      * @param ticksPerTurn Encoder ticks reported per wheel turn
-     * @param wheelPerimeter Wheel perimeter in meters
      */
     Encoder(int ticksPerTurn);
 
@@ -42,22 +38,18 @@ protected:
 
 public:
     /**
-     * @brief Returns the ground distance covered since the last @ref update call.
-     */
-    double groundDist() const;
-
-    /**
-     * @brief Returns the average speed in m/s since the last @ref update call.
-     */
-    double speed() const;
-
-    /**
-     * @brief Returns the number of wheel revolutions since last @ref update call.
+     * @brief Returns the number of wheel revolutions between the last 2 @ref update calls.
      */
     double revolutions() const;
 
+    /**
+     * @brief Returns the angle the wheel has turned between the last 2 @ref update calls.
+     */
     double radians() const;
 
+    /**
+     * @brief Returns the total radians the wheel has turned since the creation of this instance.
+     */
     double totalRadians() const;
 
     /**

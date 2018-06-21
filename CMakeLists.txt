@@ -149,7 +149,6 @@ add_executable(${PROJECT_NAME}_node
     src/PiGPIO.cpp
     src/PIDController.cpp
     src/Utils.cpp
-    src/Odometry.cpp
     src/Encoder.cpp
     src/Kurt.cpp
 )

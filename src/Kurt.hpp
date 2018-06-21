@@ -2,7 +2,6 @@
 #define KURT_HPP
 
 #include "Encoder.hpp"
-#include "Odometry.hpp"
 #include "Motor.hpp"
 #include "PIDController.hpp"
 
@@ -72,7 +71,7 @@ public:
     void read();
 
     /**
-     * @brief Writes the current encoder counts to the joint state.
+     * @brief Writes the current encoder counts to the joint state variables.
      */
     void write();
 
@@ -94,24 +93,33 @@ private:
 
     std::unique_ptr<Encoder> m_encLeft;
     std::unique_ptr<Encoder> m_encRight;
-    std::unique_ptr<Odometry> m_odom;
     std::unique_ptr<Motor> m_motLeft;
     std::unique_ptr<Motor> m_motRight;
 
     PIDController m_leftController;
     PIDController m_rightController;
 
+    /// @brief Transmits joint/encoder state to ros_control.
+    ///
+    /// This later ends up on the `/joint_states` topic via the `joint_state_controller`.
     hardware_interface::JointStateInterface m_jointState;
+    /// @brief Gets joint velocity commands from ros_control.
+    ///
+    /// The commands are set by the `diff_drive_controller`.
     hardware_interface::VelocityJointInterface m_jointCtrl;
 
-    /// @brief Command to the motors.
-    double cmd[2];
+    /// @brief Velocity commands to the motors.
+    double m_cmd[2];
     /// @brief Joint positions from encoders.
-    double pos[2];
+    ///
+    /// m_pos[0] to m_pos[2] are the left wheels, m_pos[3] to m_pos[5] are the right wheels.
+    double m_pos[6];
     /// @brief Joint velocities from encoders.
-    double vel[2];
+    ///
+    /// m_vel[0] to m_vel[2] are the left wheels, m_vel[3] to m_vel[5] are the right wheels.
+    double m_vel[6];
     /// @brief Joint efforts, always 0.
-    double eff[2];
+    double m_eff[6];
 };
 
 #endif // KURT_HPP

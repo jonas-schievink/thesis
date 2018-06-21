@@ -219,6 +219,10 @@
                     has_jerk_limits: true
                     max_jerk: 5.0
     </rosparam>
+    <!--
+    left_wheel: ['left_front_wheel_joint', 'left_middle_wheel_joint', 'left_back_wheel_joint']
+    right_wheel: ['right_front_wheel_joint', 'right_middle_wheel_joint', 'right_back_wheel_joint']
+    -->
 
     <node name="default_controller_spawner" pkg="controller_manager" type="spawner" output="screen"
       args="joint_state_controller diffdrive" />

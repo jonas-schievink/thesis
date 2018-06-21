@@ -1,16 +1,10 @@
-#include "EvdevEncoder.hpp"
-#include "Motor.hpp"
-#include "Odometry.hpp"
 #include "Kurt.hpp"
+#include "EvdevEncoder.hpp"
 
 #include <ros/ros.h>
-#include <geometry_msgs/Twist.h>
 #include <controller_manager/controller_manager.h>
 
 #include <iostream>
-#include <memory>
-#include <thread>
-#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <signal.h>
