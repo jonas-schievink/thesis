@@ -22,25 +22,6 @@ using std::cerr;
 using std::endl;
 using std::unique_ptr;
 
-/**
- * Exit handler registered with `atexit`. Shuts down pigpio.
- */
-static void on_exit()
-{
-    static bool exited = false;   // `on_exit` called?
-
-    if (exited)
-    {
-        return;
-    }
-
-    exited = true;
-
-    // pigpio needs to be properly shut down or it might break everything until
-    // the Pi is rebooted.
-    gpioTerminate();
-}
-
 static void process_args(int argc, char** argv)
 {
     if (argc > 1)
@@ -77,7 +58,6 @@ static void initPigpio(int sampleRate)
     checkPigpio(gpioCfgClock(sampleRate, 1 /* PCM = default */, 0));
 
     checkPigpio(gpioInitialise());
-    atexit(on_exit);
 
     // Restore ROS signal handlers
     signal(SIGINT, savedHandlers[0]);
