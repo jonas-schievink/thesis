@@ -3,7 +3,7 @@
     <!-- Kp: oscillation starts at roughly 0.0025 (forwards only) -->
     <arg name="Kp" default="0.00125" />
     <arg name="Ki" default="0.0" />
-    <arg name="Kd" default="0.0001" />
+    <arg name="Kd" default="0.001" />
     <arg name="windup_limit" default="1" />
 
     <param name="robot_description" command="$(find xacro)/xacro '$(find kurtberry_pi)/urdf/kurt_indoor.urdf.xacro'" />
