@@ -164,7 +164,7 @@
 
             Increasing this will increase accuracy/reactivity of the controller
             and CPU load, so this is a tradeoff. If the CPU can't keep up with
-            the configured value, errors will be logged since this messed up all
+            the configured value, errors will be logged since this messes up all
             timing.
 
             100 Hz should be more than enough for most applications.
@@ -186,7 +186,7 @@
             Output `ROS_DEBUG` messages to the console. This is a lot of
             continuous output and should only be enabled during development.
         -->
-        <param name="debug" value="false" /> <!-- Default: false -->
+        <param name="debug" value="false" />
     </node>
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
