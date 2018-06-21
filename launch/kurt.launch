@@ -7,7 +7,12 @@
     <arg name="windup_limit" default="1" />
 
     <param name="robot_description" command="$(find xacro)/xacro '$(find kurtberry_pi)/urdf/kurt_indoor.urdf.xacro'" />
-    <node name="kurtberry_pi_node" pkg="kurtberry_pi" type="kurtberry_pi_node" output="screen">
+
+    <node name="kurtberry_pi_node" pkg="kurtberry_pi" type="kurtberry_pi_node"
+        output="screen"
+        required="true"
+        launch-prefix="nice -n -1">  <!-- Increase priority with `nice` -->
+
         <!--====================================
             Motor PID parameters (mandatory)
         =====================================-->
@@ -63,9 +68,9 @@
             causes the supply voltage to dip, which in turn pulls down the 5V
             rail, causing the Pi to reset or crash.
         -->
-        <param name="pwm_sample_rate" value="5" />
+        <param name="pwm_sample_rate" value="1" />
         <param name="pwm_freq" value="2000" />
-        <param name="pwm_range" value="100" />
+        <param name="pwm_range" value="500" />
 
         <!--
             `max_delta_ms`
