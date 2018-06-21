@@ -141,6 +141,7 @@ int main(int argc, char** argv)
 
     ROS_INFO("kurtberry pi setup complete");
 
+    int missedUpdates = 0;
     while (!ros::isShuttingDown())
     {
         kurt->update();
@@ -148,12 +149,24 @@ int main(int argc, char** argv)
         cm.update(ros::Time::now(), kurt->getPeriod());
         kurt->write();
 
-        if (!rate.sleep())
+        if (rate.sleep())
         {
+            missedUpdates = 0;  // made it in time, reset miss counter
+        }
+        else
+        {
+            missedUpdates++;    // this update took too long
+        }
+
+        if (missedUpdates >= 3) {
             // The code assumes that `update` is called in regular fixed
             // intervals. If we can't keep this promise, it's an error since all
             // timing gets slightly messed up.
             // Decrease `getFreq` to properly fix this.
+            // We accept that this might happen during normal operation due to
+            // the Linux scheduler, but will print an error if it happens a few
+            // times in a row since that indicates that the system is
+            // overloaded.
 
             const char* note = debug ? " (this is expected in debug mode - set debug param to false and this should go away)" : "";
             float actualHz = 1.0 / rate.cycleTime().toSec();
