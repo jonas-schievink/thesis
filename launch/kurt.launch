@@ -50,12 +50,15 @@
             PWM sample rate (in microseconds between samples), frequency (in
             Hertz) and range to request from pigpio.
 
-            Refer to the pigpio docs for information on: sample_rate:
-            http://abyz.me.uk/rpi/pigpio/cif.html#gpioCfgClock freq:
-            http://abyz.me.uk/rpi/pigpio/cif.html#gpioSetPWMfrequency range:
+            Refer to the pigpio docs for information on:
+            sample_rate:
+            http://abyz.me.uk/rpi/pigpio/cif.html#gpioCfgClock
+            freq:
+            http://abyz.me.uk/rpi/pigpio/cif.html#gpioSetPWMfrequency
+            range:
             http://abyz.me.uk/rpi/pigpio/cif.html#gpioSetPWMrange
 
-            Since the Pi only has a single hardware PWM output, pigpio uses
+            Since the Pi only has two hardware pins with PWM output, pigpio uses
             DMA-based software PWM. This imposes a somewhat strict limit on
             frequency and range, meaning that there's now a tradeoff between
             both.
@@ -69,7 +72,7 @@
             rail, causing the Pi to reset or crash.
         -->
         <param name="pwm_sample_rate" value="1" />
-        <param name="pwm_freq" value="2000" />
+        <param name="pwm_freq" value="3000" />
         <param name="pwm_range" value="500" />
 
         <!--
