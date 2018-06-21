@@ -109,8 +109,8 @@ Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& p) :
     // Register the joint state interface.
     // It will report the current joint state as read from the encoders to ROS.
     const char* joint_names[6] = {
-        "left_front_wheel_joint", "left_middle_wheel_joint", "left_back_wheel_joint",
-        "right_front_wheel_joint", "right_middle_wheel_joint", "right_back_wheel_joint",
+        "left_front_wheel_joint", "left_middle_wheel_joint", "left_rear_wheel_joint",
+        "right_front_wheel_joint", "right_middle_wheel_joint", "right_rear_wheel_joint",
     };
     for (int i = 0; i < 6; i++)
     {
