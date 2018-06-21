@@ -164,9 +164,14 @@ if __name__ == "__main__":
         dev = args.dev[0]
 
         enc = EvdevEncoder(dev)
+        interval = 0.05  # seconds
+        last = enc.count
         while True:
-                sys.stdout.write("Count: %d     \r" % enc.count)
-                time.sleep(0.05)
+            cur = enc.count
+            spd = (cur - last) / interval
+            sys.stdout.write("Count: %s (%s / s)\r" % (str(cur).ljust(4), str(spd).ljust(5)))
+            last = cur
+            time.sleep(interval)
 
 
     parser = argparse.ArgumentParser(description='Read a rotary encoder')
