@@ -123,9 +123,13 @@ Kurt::Kurt(ros::NodeHandle& nh, ros::NodeHandle& p) :
     // Register joint control interface.
     // ros_control will write the requested angular velocities of the joints
     // there.
-    JointHandle ctrl_left(m_jointState.getHandle("left_middle_wheel_joint"), &m_cmd[0]);
+    JointHandle ctrl_left(
+        m_jointState.getHandle("left_middle_wheel_joint"),
+        &m_cmd[0]);
+    JointHandle ctrl_right(
+        m_jointState.getHandle("right_middle_wheel_joint"),
+        &m_cmd[1]);
     m_jointCtrl.registerHandle(ctrl_left);
-    JointHandle ctrl_right(m_jointState.getHandle("right_middle_wheel_joint"), &m_cmd[1]);
     m_jointCtrl.registerHandle(ctrl_right);
 
     registerInterface(&m_jointCtrl);
