@@ -59,7 +59,7 @@ Motor::Motor(MotorConfig config) :
     ROS_INFO("actual    pwm freq = %d Hz, range = %d", m_speed_pin.pwmFrequency(), m_pwmRange);
 }
 
-void Motor::setDirect(float speed)
+void Motor::setDirect(float speed, bool dryrun)
 {
     // We need to distinguish `-0.0` and `0.0` using signbit because some genius
     // though that both
@@ -70,7 +70,11 @@ void Motor::setDirect(float speed)
     bool newDir = signbit(speed);       // true = backwards
     if (oldDir != newDir)
     {
-        m_dir_pin.digitalWrite(newDir ^ m_config.invert);
+        if (!dryrun)
+        {
+            m_dir_pin.digitalWrite(newDir ^ m_config.invert);
+        }
+
         m_lastDirChange = ros::Time::now();
     }
 
@@ -85,7 +89,10 @@ void Motor::setDirect(float speed)
         duty = (unsigned int) (fabs(speed) * float(m_pwmRange));
     }
 
-    m_speed_pin.pwm(duty);
+    if (!dryrun)
+    {
+        m_speed_pin.pwm(duty);
+    }
     m_actual = speed;
 }
 
@@ -148,10 +155,7 @@ void Motor::update(bool dryrun)
 
     ROS_DEBUG("Motor::update(): setpoint=%-5.2f diff=%-5.2f delta=%-5.3fs accel=%-5.2f spd=%-5.2f", m_setpoint, diff, delta.toSec(), accel, speed);
 
-    if (!dryrun)
-    {
-        setDirect(speed);
-    }
+    setDirect(speed, dryrun);
 }
 
 bool Motor::reachedSetPoint() const

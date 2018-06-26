@@ -94,7 +94,7 @@ class Motor {
      * This will set @ref m_actual to @ref speed and configure the GPIOs to
      * drive the motor at the configured speed.
      */
-    void setDirect(float speed);
+    void setDirect(float speed, bool dryrun);
 
     /**
      * @brief Attempt to set motor direction to @ref dir
