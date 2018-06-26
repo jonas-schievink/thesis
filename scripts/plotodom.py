@@ -83,6 +83,7 @@ if __name__ == "__main__":
     print 'curve:', curve
     print 'max velocity:', args.max_vel
     print 'step delay:', args.step_delay
+    print 'Go!'
 
     startstamp = time.time()
     for i in range(args.repeat):
