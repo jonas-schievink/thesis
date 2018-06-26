@@ -160,8 +160,23 @@ void Kurt::update()
 void Kurt::read()
 {
     // read motor commands from ROS and apply them
-    m_leftController.setSetpoint(m_cmd[0]);
-    m_rightController.setSetpoint(m_cmd[1]);
+    if (m_cmd[0])
+    {
+        m_leftController.setSetpoint(m_cmd[0]);
+    }
+    else
+    {
+        m_leftController.reset();
+    }
+
+    if (m_cmd[1])
+    {
+        m_rightController.setSetpoint(m_cmd[1]);
+    }
+    else
+    {
+        m_rightController.reset();
+    }
 }
 
 void Kurt::write()

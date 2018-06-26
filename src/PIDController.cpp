@@ -39,3 +39,11 @@ float PIDController::update(float actual, float delta)
     ROS_DEBUG("PIDController::update(): setpoint=%-5.3f actual=%-5.3f error=%-5.3f delta=%-5.3f integral=%-5.3f propPortion=%-5.3f intPortion=%-5.3f derivPortion=%-5.3f effort=%-5.3f", m_setpoint, actual, error, delta, m_integral, propPortion, intPortion, derivPortion, m_effort);
     return m_effort;
 }
+
+void PIDController::reset()
+{
+    m_setpoint = 0.0f;
+    m_effort = 0.0f;
+    m_integral = 0.0f;
+    m_lastError = 0.0f;
+}

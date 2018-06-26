@@ -43,6 +43,14 @@ public:
      * This should be called in regular intervals.
      */
     float update(float actual, float delta);
+
+    /**
+     * @brief Sets the setpoint and output to 0 and clears the internal state.
+     *
+     * This can be used to "halt" the robot when it's known that the controller
+     * can safely output 0.
+     */
+    void reset();
 };
 
 #endif
