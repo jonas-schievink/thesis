@@ -10,11 +10,13 @@ NOTE: This is a Python 2 script, the others are Python 3! (Thanks, ROS!)
 import argparse
 from sys import stderr
 import time
+import threading
 
 import rospy
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 
+printlock = threading.Lock()
 
 def calcCurve(curve, t):
     """
@@ -48,11 +50,13 @@ def buildTwist(vel):
     return msg
 
 def odomCallback(odom):
-    print 'odom',odom.header.stamp,odom.twist.twist.linear.x
+    printlock.acquire()
+    print 'odom,',odom.header.stamp,',',odom.twist.twist.linear.x
+    printlock.release()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Plots reported /odom speed while changing motor speeds via /cmd_vel')
-    parser.add_argument('--time', type=float, default=3, help='Time to spend in each repetition (seconds)')
+    parser.add_argument('--time', type=float, default=5, help='Time to spend in each repetition (seconds)')
     parser.add_argument('--repeat', type=int, default=1, help='Number of repetitions')
     parser.add_argument('--max-vel', type=float, default=0.1, help='Max. velocity to request')
     parser.add_argument('--step-delay', type=float, default=0.05, help='Delay between /cmd_vel updates')
@@ -95,7 +99,9 @@ if __name__ == "__main__":
 
             # publish update
             vel = calcCurve(curve, t) * args.max_vel
-            print 'cmd_vel',now,vel
+            printlock.acquire()
+            print 'cmd_vel,',now,',',vel
+            printlock.release()
             pub.publish(buildTwist(vel))
 
             if t == 1.0:
