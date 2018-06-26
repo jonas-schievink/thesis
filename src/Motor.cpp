@@ -119,6 +119,7 @@ void Motor::update(bool dryrun)
     int64_t delta_ms = delta.toNSec() / 1000000;
     if (delta_ms > m_config.max_delta_ms)
     {
+        // This can happen when the Pi fetches the time via NTP
         ROS_WARN_STREAM_THROTTLE(1, "delay between Motor::update calls too high! time delta = " << delta_ms << " ms");
         delta_ms = m_config.max_delta_ms;
     }
