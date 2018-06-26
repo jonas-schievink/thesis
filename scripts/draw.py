@@ -36,7 +36,9 @@ for line in fcmdvel.readlines():
     cmdvely.append(y)
 
 plt.axis([minx, maxx+0.01, miny, maxy+0.01])
-cmdvel = plt.plot(cmdvelx, cmdvely, color='blue')
-odom = plt.plot(odomx, odomy, color='red')
+plt.plot(cmdvelx, cmdvely, color='blue')
+plt.plot(odomx, odomy, color='red')
+plt.xlabel('Zeit (s)')
+plt.ylabel('Geschwindigkeit (m/s)')
 plt.legend(['Zielgeschwindigkeit (/cmd_vel)', 'Wirkliche Geschwindigkeit (/odom)'])
 plt.show()
