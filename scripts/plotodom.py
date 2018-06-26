@@ -94,7 +94,7 @@ if __name__ == "__main__":
                 t = (now - starttime) / (endtime - starttime)
 
             # publish update
-            vel = calcCurve(curve, t)
+            vel = calcCurve(curve, t) * args.max_vel
             print 'cmd_vel',now,vel
             pub.publish(buildTwist(vel))
 
@@ -102,7 +102,7 @@ if __name__ == "__main__":
                 break
 
             now = time.time()
-            time.sleep(0.01)
+            time.sleep(args.step_delay)
 
     # stop motors
     pub.publish(buildTwist(0.0))
