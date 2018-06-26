@@ -11,12 +11,15 @@ import argparse
 from sys import stderr
 import time
 import threading
+import matplotlib.pyplot as plt
 
 import rospy
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 
-printlock = threading.Lock()
+startstamp = False  # unix time stamp at benchmark start
+odomx = []
+odomy = []
 
 def calcCurve(curve, t):
     """
@@ -50,12 +53,12 @@ def buildTwist(vel):
     return msg
 
 def odomCallback(odom):
-    printlock.acquire()
-    print 'odom,',odom.header.stamp,',',odom.twist.twist.linear.x
-    printlock.release()
+    time = odom.header.stamp.secs + (odom.header.stamp.nsecs / 1000000000.0)
+    odomx.append(time-startstamp)
+    odomy.append(odom.twist.twist.linear.x)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Plots reported /odom speed while changing motor speeds via /cmd_vel')
+    parser = argparse.ArgumentParser(description='Plots reported /odom speed while changing motor speeds via /cmd_vel. Output is stored in CSV files plot-odom.csv and plot-cmdvel.csv and can be turned into a graph with `draw.py`.')
     parser.add_argument('--time', type=float, default=5, help='Time to spend in each repetition (seconds)')
     parser.add_argument('--repeat', type=int, default=1, help='Number of repetitions')
     parser.add_argument('--max-vel', type=float, default=0.1, help='Max. velocity to request')
@@ -66,19 +69,24 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     curve = args.curve
+    fodom = open('plot-odom.csv', 'w')
+    fcmdvel = open('plot-cmdvel.csv', 'w')
+    cmdvelx = []
+    cmdvely = []
 
-    rospy.init_node('odom_plotter', anonymous=True)
+    rospy.init_node('odom_plotter', anonymous=True, disable_signals=True)
     pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
     rospy.Subscriber('/odom', Odometry, odomCallback)
 
-    print 'repetitions,', args.repeat
-    print 'seconds,', args.time
-    print 'curve,', curve
-    print 'max velocity,', args.max_vel
-    print 'step delay,', args.step_delay
+    print 'repetitions:', args.repeat
+    print 'seconds:', args.time
+    print 'curve:', curve
+    print 'max velocity:', args.max_vel
+    print 'step delay:', args.step_delay
 
+    startstamp = time.time()
     for i in range(args.repeat):
-        starttime = time.time()
+        starttime = time.time()  # start time of this iteration
         endtime = starttime + args.time
         now = starttime
 
@@ -99,9 +107,8 @@ if __name__ == "__main__":
 
             # publish update
             vel = calcCurve(curve, t) * args.max_vel
-            printlock.acquire()
-            print 'cmd_vel,',now,',',vel
-            printlock.release()
+            cmdvelx.append(now-starttime)
+            cmdvely.append(vel)
             pub.publish(buildTwist(vel))
 
             if t == 1.0:
@@ -112,3 +119,10 @@ if __name__ == "__main__":
 
     # stop motors
     pub.publish(buildTwist(0.0))
+
+    for i in range(len(cmdvelx)):
+        fcmdvel.write(str(cmdvelx[i])+','+str(cmdvely[i])+'\n')
+    for i in range(len(odomx)):
+        fodom.write(str(odomx[i])+','+str(odomy[i])+'\n')
+    fcmdvel.close()
+    fodom.close()
