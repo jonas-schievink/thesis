@@ -186,7 +186,7 @@
             This is useful for testing something while preventing that the robot
             moves.
         -->
-        <param name="dryrun" value="true" />
+        <param name="dryrun" value="false" />
 
         <!--
             `debug`
