@@ -61,12 +61,17 @@ Motor::Motor(MotorConfig config) :
 
 void Motor::setDirect(float speed)
 {
-    if (fabs(speed) > 0.001f)
+    // We need to distinguish `-0.0` and `0.0` using signbit because some genius
+    // though that both
+    // * `-0.0` exists and is different from `+0.0`
+    // * `-0.0 < 0.0` is false
+    // have to apply at the same time.
+    bool oldDir = signbit(m_actual);    // true = backwards
+    bool newDir = signbit(speed);       // true = backwards
+    if (oldDir != newDir)
     {
-        // Only update direction when speed is large-ish. Prevent needless
-        // direction changes when speed oscillates around 0.
-        bool backwards = speed < 0.0f;
-        m_dir_pin.digitalWrite(backwards ^ m_config.invert);
+        m_dir_pin.digitalWrite(newDir ^ m_config.invert);
+        m_lastDirChange = ros::Time::now();
     }
 
     unsigned int duty;
@@ -123,10 +128,23 @@ void Motor::update(bool dryrun)
     // clamp to maximum, keeping the sign
     accel = copysign(std::min(std::abs(accel), m_config.max_accel), accel);
 
-    // TODO direction change limit
-
+    // new speed, clamped to -1.0 ... 1.0
     float speed = std::min(std::max(m_actual + accel * static_cast<float>(delta.toSec()), -1.0f), 1.0f);
-    m_actual = speed;
+
+    if (signbit(m_actual) != signbit(speed))
+    {
+        // need to change direction, check if we already can
+        ros::Duration sinceLastDirChange = ros::Time::now() - m_lastDirChange;
+        float minTime = 1.0f / m_config.max_dir_changes;
+        if (sinceLastDirChange.toSec() <= minTime)
+        {
+            // not enough time has passed! set speed to 0 instead of going past
+            // it and keep the direction.
+            speed = copysign(0.0f, m_actual);
+            ROS_DEBUG("Motor::update - not changing dir. %fs since last change, need %fs. New speed = %f", sinceLastDirChange.toSec(), minTime, speed);
+        }
+    }
+
     ROS_DEBUG("Motor::update(): setpoint=%-5.2f diff=%-5.2f delta=%-5.3fs accel=%-5.2f spd=%-5.2f", m_setpoint, diff, delta.toSec(), accel, speed);
 
     if (!dryrun)
