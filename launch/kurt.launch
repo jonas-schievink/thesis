@@ -119,8 +119,11 @@
             Clamp speed values with a magnitude `<= deadzone` to zero. Helps
             eliminate coil whining when motors are stationary but driven with a
             low duty cycle (the PID controller won't correct this).
+
+            This shouldn't be required anymore since the controller will shut
+            down automatically when the speed is set to 0.
         -->
-        <param name="deadzone" value="0.02" />
+        <param name="deadzone" value="0.0" />
 
 
         <!--=========================
