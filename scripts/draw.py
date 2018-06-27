@@ -38,6 +38,7 @@ for line in fcmdvel.readlines():
 
 # configure TeX
 rc('text', usetex=True)
+rc('pgf', rcfonts=False)
 
 plt.figure(figsize=(4.5,4))
 plt.axis([minx, maxx+0.01, miny, maxy+0.01])
@@ -46,5 +47,5 @@ plt.plot(odomx, odomy, color='red')
 plt.xlabel('Zeit (s)')
 plt.ylabel('Geschwindigkeit ($m \over s$)')
 plt.legend([r'Zielgeschwindigkeit (\texttt{/cmd\_vel})', r'Wirkliche Geschwindigkeit (\texttt{/odom})'])
+plt.savefig('out.pgf')
 plt.show()
-
