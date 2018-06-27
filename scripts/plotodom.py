@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
     rospy.init_node('odom_plotter', anonymous=True, disable_signals=True)
     pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
-    rospy.Subscriber('/odom', Odometry, odomCallback)
+    rospy.Subscriber('/odom', Odometry, odomCallback, queue_size=1)
 
     print 'repetitions:', args.repeat
     print 'seconds:', args.time
