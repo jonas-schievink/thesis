@@ -47,6 +47,7 @@ static struct libevdev* matchDevice(
     }
 
     ROS_DEBUG("no match for evdev %s with name %s against pattern %s", dev_path.c_str(), name.c_str(), search_name.c_str());
+    libevdev_free(dev);
     return NULL;
 }
 
@@ -120,6 +121,7 @@ EvdevEncoder::EvdevEncoder(int ticksPerTurn, const std::string& search_name, int
         {
             info += libevdev_get_name(dev);
             info += "; ";
+            libevdev_free(dev);
         }
 
         throw EvdevException(info);
