@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 import matplotlib.pyplot as plt
+from matplotlib import rc
 
 minx = 0.0
 maxx = 0.0
@@ -35,10 +36,15 @@ for line in fcmdvel.readlines():
     cmdvelx.append(x)
     cmdvely.append(y)
 
+# configure TeX
+rc('text', usetex=True)
+
+plt.figure(figsize=(4.5,4))
 plt.axis([minx, maxx+0.01, miny, maxy+0.01])
 plt.plot(cmdvelx, cmdvely, color='blue')
 plt.plot(odomx, odomy, color='red')
 plt.xlabel('Zeit (s)')
-plt.ylabel('Geschwindigkeit (m/s)')
-plt.legend(['Zielgeschwindigkeit (/cmd_vel)', 'Wirkliche Geschwindigkeit (/odom)'])
+plt.ylabel('Geschwindigkeit ($m \over s$)')
+plt.legend([r'Zielgeschwindigkeit (\texttt{/cmd\_vel})', r'Wirkliche Geschwindigkeit (\texttt{/odom})'])
 plt.show()
+
