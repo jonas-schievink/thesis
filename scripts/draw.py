@@ -32,8 +32,8 @@ def read(d):
         odomy.append(y)
 
     fcmdvel = open(d+'/plot-cmdvel.csv', 'r')
-    cmdvelx = []
-    cmdvely = []
+    cmdvelx = [-0.001]
+    cmdvely = [0]
     for line in fcmdvel.readlines():
         xy = line.split(',')
         x = float(xy[0])
