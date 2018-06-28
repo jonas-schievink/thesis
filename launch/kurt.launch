@@ -196,6 +196,8 @@
 
             Output `ROS_DEBUG` messages to the console. This is a lot of
             continuous output and should only be enabled during development.
+            It can result in noticable slowdown, which might cause warnings and
+            error to be reported.
         -->
         <param name="debug" value="false" />
     </node>
