@@ -64,6 +64,8 @@ print "Creating %d graphs, %d rows by %d cols" % (len(args.data_dirs), rows, col
 fig, subplots = plt.subplots(nrows=rows, ncols=cols, sharex=True, sharey=True, figsize=(7.75,6.5))
 subplots = subplots.reshape(cols * rows)
 
+# in case we want to set the axis range ourselves:
+# (unused, matplotlib does a good job with this as long as we use subplots and do it in one pass)
 #plt.axis([minx, maxx+0.01, miny, maxy+0.01])
 
 
