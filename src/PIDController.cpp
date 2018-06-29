@@ -30,7 +30,11 @@ float PIDController::update(float actual, float delta)
     float derivPortion = (error - m_lastError) / delta * m_kd;
     m_lastError = error;
 
-    m_effort += propPortion + intPortion + derivPortion;
+    // now we can calculate the total controller output
+    float total = propPortion + intPortion + derivPortion;
+    // change the output accordingly, ensure that it stays relative to delta
+    // (otherwise controller behaviour would depend on main loop freq)
+    m_effort += total * delta;
 
     // clamp
     m_effort = std::min(MAX_EFFORT, m_effort);
