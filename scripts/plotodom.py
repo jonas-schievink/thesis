@@ -110,6 +110,7 @@ if __name__ == "__main__":
             vel = calcCurve(curve, t) * args.max_vel
             cmdvelx.append(now-starttime)
             cmdvely.append(vel)
+            stderr.write("%s m/s\r" % str(vel).ljust(5))
             pub.publish(buildTwist(vel))
 
             if t == 1.0:
@@ -117,6 +118,7 @@ if __name__ == "__main__":
 
             now = time.time()
             time.sleep(args.step_delay)
+    stderr.write("\n")
 
     # stop motors
     pub.publish(buildTwist(0.0))
