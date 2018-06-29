@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <launch>
-    <!-- Kp: oscillation starts at roughly 0.0025 (forwards only) -->
     <arg name="Kp" default="0.01" />
     <arg name="Ki" default="0.0" />
     <arg name="Kd" default="0.015" />
