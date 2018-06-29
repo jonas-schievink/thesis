@@ -57,11 +57,15 @@ rc('pgf', rcfonts=False)
 cols = 1
 if len(args.data_dirs) > 1:
     cols = 2
-rows = (len(args.data_dirs) + 1) / cols   # adding 1 to round up. this might leave a free space.
+if len(args.data_dirs) == 1:
+    rows = 1
+else:
+    rows = (len(args.data_dirs) + 1) / cols   # adding 1 to round up. this might leave a free space.
+
 print "Creating %d graphs, %d rows by %d cols" % (len(args.data_dirs), rows, cols)
 
 # set up global graph options
-fig, subplots = plt.subplots(nrows=rows, ncols=cols, sharex=True, sharey=True, figsize=(7.75,6.5))
+fig, subplots = plt.subplots(nrows=rows, ncols=cols, sharex=True, sharey=True, figsize=(7.75,6.5), squeeze=False)
 subplots = subplots.reshape(cols * rows)
 
 # in case we want to set the axis range ourselves:
