@@ -17,7 +17,7 @@ maxy = 0.0
 def read(d):
     global minx, maxx, miny, maxy
 
-    fodom = open(d+'/plot-odom.csv', 'r')
+    fodom = open(d + '/plot-odom.csv', 'r')
     odomx = []
     odomy = []
     for line in fodom.readlines():
@@ -31,7 +31,7 @@ def read(d):
         odomx.append(x)
         odomy.append(y)
 
-    fcmdvel = open(d+'/plot-cmdvel.csv', 'r')
+    fcmdvel = open(d + '/plot-cmdvel.csv', 'r')
     cmdvelx = [-0.001]
     cmdvely = [0]
     for line in fcmdvel.readlines():
