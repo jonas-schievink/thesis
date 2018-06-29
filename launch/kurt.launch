@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <launch>
     <!-- Kp: oscillation starts at roughly 0.0025 (forwards only) -->
-    <arg name="Kp" default="0.00125" />
+    <arg name="Kp" default="0.01" />
     <arg name="Ki" default="0.0" />
-    <arg name="Kd" default="0.003" />
+    <arg name="Kd" default="0.015" />
     <arg name="windup_limit" default="1" />
 
     <param name="robot_description" command="$(find xacro)/xacro '$(find kurtberry_pi)/urdf/kurt_indoor.urdf.xacro'" />
@@ -72,7 +72,7 @@
             rail, causing the Pi to reset or crash.
         -->
         <param name="pwm_sample_rate" value="1" />
-        <param name="pwm_freq" value="3000" />
+        <param name="pwm_freq" value="4000" />
         <param name="pwm_range" value="500" />
 
         <!--
