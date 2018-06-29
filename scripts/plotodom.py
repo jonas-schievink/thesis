@@ -85,47 +85,51 @@ if __name__ == "__main__":
     print 'step delay:', args.step_delay
     print 'Go!'
 
-    startstamp = time.time()
-    for i in range(args.repeat):
-        starttime = time.time()  # start time of this iteration
-        endtime = starttime + args.time
-        now = starttime
+    try:
+        startstamp = time.time()
+        for i in range(args.repeat):
+            starttime = time.time()  # start time of this iteration
+            endtime = starttime + args.time
+            now = starttime
 
-        # we guarantee that the first value of t is 0 and the last is 1.
-        # we do not guarantee any defined number of /cmd_vel updates, only the
-        # approximate time between them.
-        while True:
-            if now >= endtime:
-                t = 1.0
-            elif now < starttime:
-                # just to make sure
-                print >> stderr, "Great Scott! Time just went backwards!"
-                print >> stderr, "start=%f,end=%f,now=%f" % (starttime,endtime,now)
-                sys.exit(1)
-            else:
-                # calculate how far along we are (0..=1)
-                t = (now - starttime) / (endtime - starttime)
+            # we guarantee that the first value of t is 0 and the last is 1.
+            # we do not guarantee any defined number of /cmd_vel updates, only the
+            # approximate time between them.
+            while True:
+                if now >= endtime:
+                    t = 1.0
+                elif now < starttime:
+                    # just to make sure
+                    print >> stderr, "Great Scott! Time just went backwards!"
+                    print >> stderr, "start=%f,end=%f,now=%f" % (starttime,endtime,now)
+                    sys.exit(1)
+                else:
+                    # calculate how far along we are (0..=1)
+                    t = (now - starttime) / (endtime - starttime)
 
-            # publish update
-            vel = calcCurve(curve, t) * args.max_vel
-            cmdvelx.append(now-starttime)
-            cmdvely.append(vel)
-            stderr.write("%s m/s\r" % str(vel).ljust(5))
-            pub.publish(buildTwist(vel))
+                # publish update
+                vel = calcCurve(curve, t) * args.max_vel
+                cmdvelx.append(now-starttime)
+                cmdvely.append(vel)
+                stderr.write("%s m/s\r" % str(vel).ljust(20))
+                pub.publish(buildTwist(vel))
 
-            if t == 1.0:
-                break
+                if t == 1.0:
+                    break
 
-            now = time.time()
-            time.sleep(args.step_delay)
-    stderr.write("\n")
+                now = time.time()
+                time.sleep(args.step_delay)
+    except KeyboardInterrupt:
+        print >> stderr, "\nCtrl+C - shutting down"
+    finally:
+        stderr.write("\n")
 
-    # stop motors
-    pub.publish(buildTwist(0.0))
+        # stop motors
+        pub.publish(buildTwist(0.0))
 
-    for i in range(len(cmdvelx)):
-        fcmdvel.write(str(cmdvelx[i])+','+str(cmdvely[i])+'\n')
-    for i in range(len(odomx)):
-        fodom.write(str(odomx[i])+','+str(odomy[i])+'\n')
-    fcmdvel.close()
-    fodom.close()
+        for i in range(len(cmdvelx)):
+            fcmdvel.write(str(cmdvelx[i])+','+str(cmdvely[i])+'\n')
+        for i in range(len(odomx)):
+            fodom.write(str(odomx[i])+','+str(odomy[i])+'\n')
+        fcmdvel.close()
+        fodom.close()
