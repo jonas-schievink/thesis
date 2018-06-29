@@ -10,6 +10,7 @@ NOTE: This is a Python 2 script, the others are Python 3! (Thanks, ROS!)
 import argparse
 from sys import stderr
 import time
+import os
 import threading
 import matplotlib.pyplot as plt
 
@@ -59,18 +60,22 @@ def odomCallback(odom):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Plots reported /odom speed while changing motor speeds via /cmd_vel. Output is stored in CSV files plot-odom.csv and plot-cmdvel.csv and can be turned into a graph with `draw.py`.')
-    parser.add_argument('--time', type=float, default=5, help='Time to spend in each repetition (seconds)')
+    parser.add_argument('--time', type=float, default=8, help='Time to spend in each repetition (seconds)')
     parser.add_argument('--repeat', type=int, default=1, help='Number of repetitions')
     parser.add_argument('--max-vel', type=float, default=0.1, help='Max. velocity to request')
     parser.add_argument('--step-delay', type=float, default=0.05, help='Delay between /cmd_vel updates')
+    parser.add_argument('--out-dir', type=str, default='.', help='CSV output directory')
     parser.add_argument('curve', type=str, help='Kind of velocity curve to send', choices=[
         'none','const','rampupdown','onoff'
     ])
 
     args = parser.parse_args()
     curve = args.curve
-    fodom = open('plot-odom.csv', 'w')
-    fcmdvel = open('plot-cmdvel.csv', 'w')
+    d = args.out_dir
+    if not os.path.exists(d):
+        os.makedirs(d)
+    fodom = open(d + '/plot-odom.csv', 'w')
+    fcmdvel = open(d + '/plot-cmdvel.csv', 'w')
     cmdvelx = []
     cmdvely = []
 
