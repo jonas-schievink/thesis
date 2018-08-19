@@ -69,6 +69,9 @@ Zum Ausführen (aufgrund des GPIO-Zugriffs werden Root-Rechte benötigt, daher
     sudo -s
     roslaunch kurtberry_pi kurt.launch
 
+Alternativ ermöglicht das Launchfile `kurt-ps3.launch` die Fernsteuerung des
+Roboters mit einem per Bluetooth verbundenen PS3-Controller.
+
 ## Copyright
 
 Enthält Teile von [`kurt_driver`](https://github.com/uos/kurt_driver).
