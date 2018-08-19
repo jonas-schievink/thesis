@@ -18,6 +18,9 @@ Der LAN-Port des Pis kann benutzt werden, um ihn an ein größeres ROS-Setup
 anzubinden. Der Pi ist `192.168.100.1/24` und hat zusätzlich [mDNS][] um als
 `kurtberry-pi.local` erreichbar zu sein.
 
+SSH-Zugang: Nutzer `pi`, Passwort `kurtberryp1` (oder `kurtberry-p1`, siehe
+Zettel im Roboter).
+
 [mDNS]: https://en.wikipedia.org/wiki/Multicast_DNS
 
 ### Encodertreiber (Device Tree)
