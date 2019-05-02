@@ -6,3 +6,7 @@ __pycache__/
 
 # Compiled device tree overlays
 *.dtbo
+
+# KiCad backup files
+*.bak
+*.kicad_pcb-bak

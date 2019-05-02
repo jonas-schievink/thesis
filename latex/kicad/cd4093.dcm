@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP CD4093
+D Quad 2-Input NAND Schmitt Trigger, SOIC-14
+K NAND2
+F https://assets.nexperia.com/documents/data-sheet/HEF4093B.pdf
+$ENDCMP
+#
+#End Doc Library
